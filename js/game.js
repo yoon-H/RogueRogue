@@ -1,15 +1,6 @@
 import chalk from 'chalk';
 import readlineSync from 'readline-sync';
-
-class Player {
-    constructor() {
-        this.hp = 100;
-    }
-
-    attack() {
-        // 플레이어의 공격
-    }
-}
+import { Player } from './player.js';
 
 class Monster {
     constructor() {
@@ -23,15 +14,23 @@ class Monster {
 
 function displayStatus(stage, player, monster) {
     console.log(chalk.magentaBright(`\n=== Current Status ===`));
-    console.log(
-        chalk.cyanBright(`| Stage: ${stage} `) +
-        chalk.blueBright(
-            `| 플레이어 정보`,
-        ) +
-        chalk.redBright(
-            `| 몬스터 정보 |`,
-        ),
-    );
+    console.log(chalk.cyanBright(`| Stage: ${stage} |\n`));
+    console.log(chalk.blueBright(
+`
+| 플레이어 정보
+----------------
+| LEVEL : ${player.level} 
+| HP    : ${player.hp}\n`
+))
+
+    console.log(chalk.redBright(`
+| 몬스터 정보
+----------------
+| LEVEL :   
+| HP    :   `
+
+    ))
+
     console.log(chalk.magentaBright(`=====================\n`));
 }
 
@@ -57,6 +56,7 @@ const battle = async (stage, player, monster) => {
 
 };
 
+// 게임 시작
 export async function startGame() {
     console.clear();
     const player = new Player();
