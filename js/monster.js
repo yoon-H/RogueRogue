@@ -1,4 +1,4 @@
-class Monster {
+export class Monster {
     constructor() {
         this._level = 1;
         this._hp = 60;

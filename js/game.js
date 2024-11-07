@@ -1,16 +1,7 @@
 import chalk from 'chalk';
 import readlineSync from 'readline-sync';
 import { Player } from './player.js';
-
-class Monster {
-    constructor() {
-        this.hp = 100;
-    }
-
-    attack() {
-        // 몬스터의 공격
-    }
-}
+import {Monster} from './monster.js';
 
 function displayStatus(stage, player, monster) {
     console.log(chalk.magentaBright(`\n=== Current Status ===`));
@@ -26,8 +17,8 @@ function displayStatus(stage, player, monster) {
     console.log(chalk.redBright(`
 | 몬스터 정보
 ----------------
-| LEVEL :   
-| HP    :   `
+| LEVEL : ${monster.level} 
+| HP    : ${monster.hp}\n`
 
     ))
 
@@ -55,6 +46,22 @@ const battle = async (stage, player, monster) => {
     }
 
 };
+
+
+function handleUserInput(choice) {
+    switch (choice) {
+        case 1 : //attack
+
+            break;
+
+        default :
+
+    }
+
+
+}
+
+
 
 // 게임 시작
 export async function startGame() {

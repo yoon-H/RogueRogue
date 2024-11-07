@@ -7,7 +7,8 @@ export class Player {
         this._maxDamage = 10;
         this._speed = 5;
         this._equipment = {};       // 장비 칸
-        this._statusEffect = {};    // 방어구 칸
+        this._statusEffect = {};    // 상태 이상 칸
+        this._buffEffect = {};      // 속성 버프 칸
     }
 
     get level() {
@@ -34,6 +35,16 @@ export class Player {
         let amount = Math.floor(Math.random() * (this._maxDamage - this._minDamage + 1)) + this._minDamage;
 
         return amount;
+    }
+
+    takeDamage(damage) {
+        hp = hp - damage;
+
+        if (hp <= 0) {
+            //TODO gameover task
+
+            return true; //dead
+        }
     }
 
 }
