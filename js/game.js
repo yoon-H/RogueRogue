@@ -49,19 +49,19 @@ const battle = async (stage, player, monster) => {
         // 탈출 체크
         if (player.isDead) {
             GameManager.isGameOver = true;
-            await gameOver();
+            gameOver();
             break;
         }
 
         if (monster.isDead) {
             hasWon = true;
-            await stageClear();
+            stageClear();
             break;
         }
 
         if(hasRun)
         {
-            await runAway();
+            runAway();
             break;
         }
         // end 탈출 체크
@@ -72,6 +72,8 @@ const battle = async (stage, player, monster) => {
             ),
         );
         const choice = readlineSync.question('당신의 선택은? ');
+
+        logs = [];
 
         // 플레이어의 선택에 따라 다음 행동 처리
         logs.push(chalk.green(`${choice}를 선택하셨습니다.`));
