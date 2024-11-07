@@ -1,18 +1,20 @@
 import chalk from 'chalk';
 import readlineSync from 'readline-sync';
 import { Player } from './player.js';
-import {Monster} from './monster.js';
+import { Monster } from './monster.js';
+import { GameManager } from './gameManager.js';
+import { start } from "./server.js";
 
 function displayStatus(stage, player, monster) {
     console.log(chalk.magentaBright(`\n=== Current Status ===`));
-    console.log(chalk.cyanBright(`| Stage: ${stage} |\n`));
+    console.log(chalk.cyanBright(`| Stage: ${stage} | Gameover : ${GameManager.isGameOver}\n`));
     console.log(chalk.blueBright(
-`
+        `
 | 플레이어 정보
 ----------------
 | LEVEL : ${player.level} 
 | HP    : ${player.hp}\n`
-))
+    ))
 
     console.log(chalk.redBright(`
 | 몬스터 정보
@@ -26,32 +28,30 @@ function displayStatus(stage, player, monster) {
 }
 
 const battle = async (stage, player, monster) => {
+
     let logs = [];
 
     // 이겼나
     let hasWon = false;
 
-    // 졌나
-    let hasDefeated = false;
-
-    while (player.hp > 0) {
+    while (!GameManager.isGameOver) {
         console.clear();
-
-        if(player.isDead)
-        {
-            hasDefeated = true;
-            break;
-        }
-
-        if(monster.isDead)
-        {
-            hasWon = true;
-            break;
-        }
 
         displayStatus(stage, player, monster);
 
         logs.forEach((log) => console.log(log));
+
+        if (player.isDead) {
+            GameManager.isGameOver = true;
+            await gameOver();
+            break;
+        }
+
+        if (monster.isDead) {
+            hasWon = true;
+            await stageClear();
+            break;
+        }
 
         console.log(
             chalk.green(
@@ -66,14 +66,26 @@ const battle = async (stage, player, monster) => {
         handleUserInput(logs, choice, player, monster)
     }
 
-
+    return hasWon;
 
 };
+
+const gameOver = async() => {
+    console.log(chalk.red(`GAME OVER!`));
+
+    readlineSync.question('엔터를 눌러주세요.');
+}
+
+const stageClear = async() => {
+    console.log(chalk.green(`이겼습니다!`));
+
+    readlineSync.question('엔터를 눌러주세요.');
+}
 
 
 function handleUserInput(logs, choice, player, monster) {
     switch (choice) {
-        case '1' :    // attack
+        case '1':    // attack
             let playerDamage = player.damage;
             monster.takeDamage(playerDamage);
 
@@ -84,8 +96,10 @@ function handleUserInput(logs, choice, player, monster) {
 
             logs.push(chalk.red(`${monster.damage}만큼 공격 당했습니다!`));
 
+            logs.push('\n');
+
             break;
-        default :   // run away
+        default:   // run away
 
     }
 }
@@ -100,10 +114,23 @@ export async function startGame() {
 
     while (stage <= 10) {
         const monster = new Monster(stage);
-        await battle(stage, player, monster);
+        let hasWon = await battle(stage, player, monster);
+
+        //GameOver
+        if (GameManager.isGameOver) {
+            GameManager.isGameOver = false;
+            player.isDead = false;
+            start();
+            break;
+        }
+
+        // 플레이어 체력 회복
+        player.reset();
 
         // 스테이지 클리어 및 게임 종료 조건
 
-        stage++;
+        if (hasWon) {
+            stage++;
+        }
     }
 }
