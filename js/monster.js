@@ -1,10 +1,9 @@
-
-export class Player {
+export class Monster {
     constructor() {
         this._level = 1;
-        this._hp = 100;
-        this._minDamage = 5;
-        this._maxDamage = 10;
+        this._hp = 60;
+        this._minDamage = 2;
+        this._maxDamage = 12;
         this._speed = 5;
         this._equipment = {};       // 장비 칸
         this._statusEffect = {};    // 상태 이상 칸
@@ -41,7 +40,8 @@ export class Player {
         hp = hp - damage;
 
         if (hp <= 0) {
-            //TODO gameover task
+            //TODO give exp
+            //TODO give random item
 
             return true; //dead
         }
