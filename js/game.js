@@ -7,20 +7,24 @@ import { start } from "./server.js";
 
 function displayStatus(stage, player, monster) {
     console.log(chalk.magentaBright(`\n=== Current Status ===`));
-    console.log(chalk.cyanBright(`| Stage: ${stage} | Gameover : ${GameManager.isGameOver}\n`));
+    console.log(chalk.cyanBright(`| Stage: ${stage} |\n`));
     console.log(chalk.blueBright(
         `
 | 플레이어 정보
 ----------------
-| LEVEL : ${player.level} 
-| HP    : ${player.hp}\n`
+| LEVEL  : ${player.level} 
+| HP     : ${player.hp}
+| Attack : ${player.attackAmount()}
+\n`
     ))
 
     console.log(chalk.redBright(`
 | 몬스터 정보
 ----------------
-| LEVEL : ${monster.level} 
-| HP    : ${monster.hp}\n`
+| LEVEL  : ${monster.level} 
+| HP     : ${monster.hp}
+| Attack : ${monster.attackAmount()}
+\n`
 
     ))
 
@@ -33,6 +37,7 @@ const battle = async (stage, player, monster) => {
 
     // 이겼나
     let hasWon = false;
+    let hasRun = false;
 
     while (!GameManager.isGameOver) {
         console.clear();
@@ -41,6 +46,7 @@ const battle = async (stage, player, monster) => {
 
         logs.forEach((log) => console.log(log));
 
+        // 탈출 체크
         if (player.isDead) {
             GameManager.isGameOver = true;
             await gameOver();
@@ -53,9 +59,16 @@ const battle = async (stage, player, monster) => {
             break;
         }
 
+        if(hasRun)
+        {
+            await runAway();
+            break;
+        }
+        // end 탈출 체크
+
         console.log(
             chalk.green(
-                `\n1. 공격한다 2. 아무것도 하지 않는다.`,
+                `\n1. 공격한다 2. 도망간다.`,
             ),
         );
         const choice = readlineSync.question('당신의 선택은? ');
@@ -63,13 +76,15 @@ const battle = async (stage, player, monster) => {
         // 플레이어의 선택에 따라 다음 행동 처리
         logs.push(chalk.green(`${choice}를 선택하셨습니다.`));
 
-        handleUserInput(logs, choice, player, monster)
+        hasRun = await handleUserInput(logs, choice, player, monster)
+
     }
 
     return hasWon;
 
 };
 
+//분기 처리
 const gameOver = async() => {
     console.log(chalk.red(`GAME OVER!`));
 
@@ -82,8 +97,16 @@ const stageClear = async() => {
     readlineSync.question('엔터를 눌러주세요.');
 }
 
+const runAway = async() => {
+    console.log(chalk.blue(`도망쳤습니다!`));
 
-function handleUserInput(logs, choice, player, monster) {
+    readlineSync.question('엔터를 눌러주세요.');
+}
+// end 분기 처리
+
+async function handleUserInput(logs, choice, player, monster) {
+
+    let flag = false;
     switch (choice) {
         case '1':    // attack
             let playerDamage = player.damage;
@@ -91,17 +114,22 @@ function handleUserInput(logs, choice, player, monster) {
 
             logs.push(chalk.blue(`${playerDamage}만큼 공격했습니다!`));
 
+            //defense
             let monsterDamage = monster.damage;
             player.takeDamage(monsterDamage);
 
             logs.push(chalk.red(`${monster.damage}만큼 공격 당했습니다!`));
 
             logs.push('\n');
-
             break;
-        default:   // run away
+
+        case '2':   // run away
+            flag = true;
+            break;
 
     }
+
+    return flag;
 }
 
 

@@ -53,4 +53,8 @@ export class Monster {
         }
     }
 
+    attackAmount() {
+        return (this._maxDamage + this._minDamage) /2;
+    }
+
 }

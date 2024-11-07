@@ -60,4 +60,8 @@ export class Player {
         this._hp = this._MaxHP;
     }
 
+    attackAmount() {
+        return (this._maxDamage + this._minDamage) /2;
+    }
+
 }
