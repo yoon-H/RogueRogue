@@ -28,37 +28,66 @@ function displayStatus(stage, player, monster) {
 const battle = async (stage, player, monster) => {
     let logs = [];
 
+    // 이겼나
+    let hasWon = false;
+
+    // 졌나
+    let hasDefeated = false;
+
     while (player.hp > 0) {
         console.clear();
+
+        if(player.isDead)
+        {
+            hasDefeated = true;
+            break;
+        }
+
+        if(monster.isDead)
+        {
+            hasWon = true;
+            break;
+        }
+
         displayStatus(stage, player, monster);
 
         logs.forEach((log) => console.log(log));
 
         console.log(
             chalk.green(
-                `\n1. 공격한다 2. 아무것도 하지않는다.`,
+                `\n1. 공격한다 2. 아무것도 하지 않는다.`,
             ),
         );
         const choice = readlineSync.question('당신의 선택은? ');
 
         // 플레이어의 선택에 따라 다음 행동 처리
         logs.push(chalk.green(`${choice}를 선택하셨습니다.`));
+
+        handleUserInput(logs, choice, player, monster)
     }
+
+
 
 };
 
 
-function handleUserInput(choice) {
+function handleUserInput(logs, choice, player, monster) {
     switch (choice) {
-        case 1 : //attack
+        case '1' :    // attack
+            let playerDamage = player.damage;
+            monster.takeDamage(playerDamage);
+
+            logs.push(chalk.blue(`${playerDamage}만큼 공격했습니다!`));
+
+            let monsterDamage = monster.damage;
+            player.takeDamage(monsterDamage);
+
+            logs.push(chalk.red(`${monster.damage}만큼 공격 당했습니다!`));
 
             break;
-
-        default :
+        default :   // run away
 
     }
-
-
 }
 
 

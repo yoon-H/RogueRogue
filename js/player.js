@@ -2,6 +2,7 @@
 export class Player {
     constructor() {
         this._level = 1;
+        this._isDead = false;
         this._hp = 100;
         this._minDamage = 5;
         this._maxDamage = 10;
@@ -38,12 +39,14 @@ export class Player {
     }
 
     takeDamage(damage) {
-        hp = hp - damage;
+        this._hp = this._hp - damage;
 
-        if (hp <= 0) {
+        if (this._hp <= 0) {
+            this._hp = 0;
+
             //TODO gameover task
-
-            return true; //dead
+            
+            this._isDead = true; //dead
         }
     }
 
