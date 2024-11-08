@@ -1,10 +1,22 @@
 import chalk from 'chalk';
-import readlineSync from 'readline-sync';
+//import readlineSync from 'readline-sync';
+import keypress from 'keypress';
 import { Player } from './player.js';
 import { Monster } from './monster.js';
 import { GameManager } from './gameManager.js';
 import { start } from "./server.js";
 
+keypress(process.stdin);
+
+function displayScreen(logs, stage, player, monster) {
+    displayStatus(stage, player, monster);
+
+    logs.forEach((log) => console.log(log));
+}
+
+
+
+//정보 보여주기
 function displayStatus(stage, player, monster) {
     console.log(chalk.magentaBright(`\n=== Current Status ===`));
     console.log(chalk.cyanBright(`| Stage: ${stage} |\n`));
@@ -42,9 +54,7 @@ const battle = async (stage, player, monster) => {
     while (!GameManager.isGameOver) {
         console.clear();
 
-        displayStatus(stage, player, monster);
-
-        logs.forEach((log) => console.log(log));
+        displayScreen(logs, stage, player, monster);
 
         // 탈출 체크
         if (player.isDead) {
@@ -59,8 +69,7 @@ const battle = async (stage, player, monster) => {
             break;
         }
 
-        if(hasRun)
-        {
+        if (hasRun) {
             runAway();
             break;
         }
@@ -87,19 +96,19 @@ const battle = async (stage, player, monster) => {
 };
 
 //분기 처리
-const gameOver = async() => {
+const gameOver = async () => {
     console.log(chalk.red(`GAME OVER!`));
 
     readlineSync.question('엔터를 눌러주세요.');
 }
 
-const stageClear = async() => {
+const stageClear = async () => {
     console.log(chalk.green(`이겼습니다!`));
 
     readlineSync.question('엔터를 눌러주세요.');
 }
 
-const runAway = async() => {
+const runAway = async () => {
     console.log(chalk.blue(`도망쳤습니다!`));
 
     readlineSync.question('엔터를 눌러주세요.');
