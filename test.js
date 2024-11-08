@@ -1,8 +1,9 @@
 import keypress from 'keypress';
 keypress(process.stdin);
 
-function selectOption() {
-    const options = ["Option 1", "Option 2", "Option 3", "Option 4"];
+
+
+function selectOption(options) {
     let index = 0;
 
     return new Promise((resolve) => {
@@ -14,7 +15,7 @@ function selectOption() {
 }
 
 
-
+//옵션 보여주기
 function renderOptions(options, selectedIndex) {
     console.clear();
     console.log(options);
@@ -28,6 +29,7 @@ function renderOptions(options, selectedIndex) {
     console.log("\nUse 1 (up), 2 (down), and Enter to select.");
 }
 
+// 선택하기
 function select(options, selectedIndex, resolve) {
     process.stdin.setRawMode(true);
     process.stdin.resume();
