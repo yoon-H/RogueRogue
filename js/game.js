@@ -19,8 +19,6 @@ async function selectOption(logs, stage, player, monster, options) {
         _monster: monster
     }
 
-    console.log("this is options");
-
 
     //기존 로그 출력
     displayScreen(logs, stage, player, monster);
@@ -30,8 +28,6 @@ async function selectOption(logs, stage, player, monster, options) {
 
     //선택하기
     index = await select(printValues, options , index);  // resolve를 파라미터로 전달
-
-    console.log("select result : " , index);
 
     return index;
 
@@ -135,36 +131,26 @@ const battle = async (stage, player, monster) => {
     while (!GameManager.isGameOver) {
         //console.clear();
 
-        console.log("first display");
         displayScreen(logs, stage, player, monster);
 
         // 탈출 체크
         if (player.isDead) {
             GameManager.isGameOver = true;
-            gameOver();
+            await gameOver();
             break;
         }
 
         if (monster.isDead) {
             hasWon = true;
-            stageClear();
+            await stageClear();
             break;
         }
 
         if (hasRun) {
-            runAway();
+            await runAway();
             break;
         }
         // end 탈출 체크
-
-        // console.log(
-        //     chalk.green(
-        //         `\n1. 공격한다 2. 도망간다.`,
-        //     ),
-        // );
-        // const choice = readlineSync.question('당신의 선택은? ');
-
-        
 
         let actions = ['1. 공격한다.', '2. 도망간다.'];
 
@@ -174,16 +160,10 @@ const battle = async (stage, player, monster) => {
 
         logs = [];
 
-        console.log("log");
-
         // 플레이어의 선택에 따라 다음 행동 처리
         logs.push(chalk.green(`${actions[choice]} 를 선택하셨습니다.`));
 
-        console.log("after choice log");
-
         hasRun = await handleUserInput(logs, choice, player, monster);
-
-        console.log("after handle");
 
     }
 
@@ -195,28 +175,55 @@ const battle = async (stage, player, monster) => {
 const gameOver = async () => {
     console.log(chalk.red(`GAME OVER!`));
 
-    //readlineSync.question('엔터를 눌러주세요.');
+    console.log(`엔터를 눌러주세요.`);
+    await confirm();
 }
 
 const stageClear = async () => {
     console.log(chalk.green(`이겼습니다!`));
 
-    //readlineSync.question('엔터를 눌러주세요.');
+    console.log(`엔터를 눌러주세요.`);
+    await confirm();
 }
 
 const runAway = async () => {
     console.log(chalk.blue(`도망쳤습니다!`));
 
-    //readlineSync.question('엔터를 눌러주세요.');
+    console.log(`엔터를 눌러주세요.`);
+    await confirm();
 }
 // end 분기 처리
 
+// end로 넘기기
+function confirm() {
+    return new Promise ((resolve) => {
+        function handleConfirmInput(ch, key) {
+            if (key) {
+                if (key.name === "return") {
 
+                    //입력 설정(입력 이벤트 제거)
+                    process.stdin.setRawMode(false);
+                    process.stdin.pause();
+                    process.stdin.removeListener("keypress", handleConfirmInput); // 이벤트 리스너 제거
+                    resolve(true); // 선택 완료 후 resolve 호출
+                } else if (key.ctrl && key.name === "c") {
+                    process.exit();
+                }
+            }
+        }
+
+        // 입력 설정
+        process.stdin.on("keypress", handleConfirmInput);
+        process.stdin.setRawMode(true);
+        process.stdin.resume();
+
+    })
+
+}
 
 
 
 async function handleUserInput(logs, choice, player, monster) {
-    console.log("handleUserInput");
     let flag = false;
     switch (choice) {
         case 0:    // attack
