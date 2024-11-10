@@ -26,7 +26,6 @@ function renderOptions(options, selectedIndex) {
             console.log(`  ${option}`);
         }
     });
-    console.log("\nUse 1 (up), 2 (down), and Enter to select.");
 }
 
 // 선택하기

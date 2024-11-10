@@ -47,7 +47,6 @@ function select(values, options, selectedIndex) {
                     displayScreen(values._logs, values._stage, values._player, values._monster);
                     renderOptions(options, selectedIndex);
                 } else if (key.name === "return") {
-                    console.log(`\nYou selected: ${options[selectedIndex]}`);
 
                     //입력 설정(입력 이벤트 제거)
                     process.stdin.setRawMode(false);
