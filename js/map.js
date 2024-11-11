@@ -50,11 +50,11 @@ class Container {
         //Container
         this._lChild = null;
         this._rChild = null;
-        this._parent;
+        this._parent = null;
 
         //room and road
-        this._room;
-        this._road;
+        this._room = null;
+        this._road = null;
     }
 
     getParent() {
@@ -85,9 +85,11 @@ class Container {
 const MAP_WIDTH = 40;
 const MAP_HEIGHT = 20;
 
-//room 최소 크기
-const MIN_ROOM_W = 10;
-const MIN_ROOM_H = 6;
+//room 최소, 최대 크기
+const MIN_ROOM_W = 3;
+const MIN_ROOM_H = 3;
+const MAX_ROOM_W = 10;
+const MAX_ROOM_H = 8;
 
 //분할 비율
 const MIN_WIDTH = 4;
@@ -113,10 +115,24 @@ function makeRoom(container) {
     //컨테이너의 방 지정하기
     container._room = room;
 
-    console.log(room._x, room._y, room._w, room._h);
-
     return room;
 }
+
+//사이즈 체크 후 분할 결정
+function checkSize(parent, width, height) {
+
+    if ((width - 4 <= MIN_ROOM_W) || (height - 4 <= MIN_ROOM_H)) {
+        return false;
+    }
+    else if ((width - 4 <= MAX_ROOM_W) && (height - 4 <= MAX_ROOM_H)) {
+        //방 생성
+        makeRoom(parent);
+        return false;
+    }
+
+    return true;
+}
+
 
 //나누기
 function divide(parent) {
@@ -129,20 +145,15 @@ function divide(parent) {
     let w = parent._w;
     let h = parent._h;
 
-    if ((w - 4 <= MIN_ROOM_W) && (h - 4 <= MIN_ROOM_H)) {
-
-        console.log('div' , w, h);
-        //방 생성
-        makeRoom(parent);
-        return;
-    }
-
     // 분할 비율 정하기
     let divRatio = Math.floor(Math.random() * (MAX_WIDTH - MIN_WIDTH + 1)) + MIN_WIDTH;
 
     if (width > height) {   // 가로 길이가 더 클 경우 가로 분할(좌 우)
 
         let slicedW = Math.floor(w * divRatio / 10);
+
+        // 사이즈 체크
+        if(!checkSize(parent, width, height)) return;
 
         // lchild
         let lChild = new Container(x, y, slicedW, h);
@@ -158,6 +169,9 @@ function divide(parent) {
 
     } else {    // 세로 분할(위 아래)
         let slicedH = Math.floor( h * divRatio / 10);
+
+        // 사이즈 체크
+        if(!checkSize(parent, width, height)) return;
 
         // lchild
         let lChild = new Container(x, y, w, slicedH);
@@ -175,12 +189,11 @@ function divide(parent) {
 
 function connect(root, arr) {
 
-    arr[root._x][root._y] = 5;
-
+    //마지막 컨테이너면 return
     if (root._lChild === null || root._rChild === null) return;
-
-    let lCenter = root._lChild.getCenter();
-    let rCenter = root._rChild.getCenter();
+    
+    let lCenter = root._lChild.getCenter()
+    let rCenter = root._rChild.getCenter()
 
     // 센터끼리 연결
     let road = new Road(new Point(lCenter.x,lCenter.y), new Point(rCenter.x, rCenter.y));
