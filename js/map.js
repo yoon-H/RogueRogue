@@ -300,19 +300,15 @@ function checkTile(arr, x, y) {
     }
     else if(arr[x][y] === '·')
     {
-        console.log(arr[x][y]);
         return true;
     }
     else{
-        console.log(arr[x][y]);
         return false;
     }
 }
 
 // 입력하기
 function userMoveInput(arr, player) {
-
-    console.log("input");
 
     return new Promise ((resolve) => {
         function handleMoveInput(ch, key) {
@@ -339,8 +335,6 @@ function userMoveInput(arr, player) {
                 }
             }
         }
-
-        console.log('key press');
     
         // 입력 설정
         process.stdin.on("keypress", handleMoveInput);
