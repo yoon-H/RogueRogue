@@ -1,3 +1,7 @@
+import keypress from 'keypress';
+
+keypress(process.stdin);
+
 class Point {
     constructor(x, y) {
         this._x = x;
@@ -191,7 +195,7 @@ function connect(root, arr) {
 
     //마지막 컨테이너면 return
     if (root._lChild === null || root._rChild === null) return;
-    
+
     let lCenter = root._lChild.getCenter()
     let rCenter = root._rChild.getCenter()
 
@@ -204,14 +208,14 @@ function connect(root, arr) {
     {
         for (let i = lCenter.y ; i < rCenter.y; i++)
         {
-            arr[lCenter.x][i] = 2;
+            arr[lCenter.x][i] = '·';
         }
     }
     else if (lCenter.y === rCenter.y)
     {
         for (let i = lCenter.x; i < rCenter.x; i++)
         {
-            arr[i][lCenter.y] = 2;
+            arr[i][lCenter.y] = '·';
         }
     }
     
@@ -221,11 +225,9 @@ function connect(root, arr) {
 }
 
 //BSP 알고리즘
-function BSP() {
+function BSP( arr, player) {
 
     console.clear();
-
-    let arr = Array.from(new Array(MAP_HEIGHT), () => new Array(MAP_WIDTH).fill(' '));
 
     const root = new Container(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
@@ -236,7 +238,7 @@ function BSP() {
     //방 정보 받기
     let rooms = [];
     root.getRoom(rooms);
-    
+
     for(let room of rooms)
     {
         const x = room._x;
@@ -248,11 +250,23 @@ function BSP() {
             {
                 for (let j = y; j < y + w; j++)
                 {
-                    arr[i][j] = 1;
+                    arr[i][j] = '·';
+
+                    player.x = i;
+                    player.y = j;
                 }
             }
 
     }
+
+    arr[player.x][player.y] = '●';
+
+    printBoard(arr);
+}
+
+//화면 출력
+function printBoard(arr) {
+    console.clear();
 
     for (let row of arr) {
         let text = '';
@@ -261,8 +275,98 @@ function BSP() {
         }
 
         console.log(text);
-
     }
 }
 
-BSP();
+// 이동하기
+function move(arr, dx, dy , player) {
+    arr[player.x][player.y] = '·';
+
+    player.x += dx;
+    player.y += dy;
+
+    arr[player.x][player.y] = '●';
+
+    
+    printBoard(arr);
+}
+
+// 타일 탐색
+function checkTile(arr, x, y) {
+    if(arr[x][y] === '%')
+    {
+        console.log(arr[x][y]);
+        return false;
+    }
+    else if(arr[x][y] === '·')
+    {
+        console.log(arr[x][y]);
+        return true;
+    }
+    else{
+        console.log(arr[x][y]);
+        return false;
+    }
+}
+
+// 입력하기
+function userMoveInput(arr, player) {
+
+    console.log("input");
+
+    return new Promise ((resolve) => {
+        function handleMoveInput(ch, key) {
+            console.log(key.name);
+            if (key) {
+                if (key.name === "up" || ch === '1') { //위로 가기
+                    if(checkTile(arr, player.x -1, player.y + 0)) 
+                        move(arr, -1, 0, player);  
+                    resolve(true);          
+                } else if (key.name === "down") { //아래로 가기
+                    if(checkTile(arr, player.x + 1, player.y + 0)) 
+                        move(arr, 1, 0, player);     
+                    resolve(true); 
+                } else if (key.name === "left") { //왼쪽으로 가기
+                    if(checkTile(arr, player.x + 0, player.y -1)) 
+                        move(arr, 0, -1, player);     
+                    resolve(true); 
+                } else if (key.name === "right") { //오른쪽으로 가기
+                    if(checkTile(arr, player.x + 0, player.y +1)) 
+                        move(arr, 0, 1, player);     
+                    resolve(true); 
+                } else if (key.ctrl && key.name === "c") {
+                    process.exit();
+                }
+            }
+        }
+
+        console.log('key press');
+    
+        // 입력 설정
+        process.stdin.on("keypress", handleMoveInput);
+        process.stdin.setRawMode(true);
+        process.stdin.resume();
+    })
+    
+}
+
+
+async function game() {
+
+    let player = new Point(0,0);
+    let arr = Array.from(new Array(MAP_HEIGHT), () => new Array(MAP_WIDTH).fill('%'));
+
+    //BSP 알고리즘 실행
+    BSP(arr, player);
+
+    await userMoveInput(arr, player);
+
+    console.log("last");
+}
+
+
+game();
+
+
+
+
