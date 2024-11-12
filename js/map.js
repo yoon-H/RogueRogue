@@ -152,7 +152,7 @@ function divide(parent) {
     let h = parent._h;
 
     // 분할 비율 정하기
-    let divRatio = Math.floor(Math.random() * (MAX_WIDTH - MIN_WIDTH + 1)) + MIN_WIDTH;
+    let divRatio = getRandomNum(MIN_WIDTH, MAX_WIDTH);
 
     if (width > height) {   // 가로 길이가 더 클 경우 가로 분할(좌 우)
 
