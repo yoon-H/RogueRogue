@@ -1,4 +1,5 @@
 import keypress from 'keypress';
+import { Calc } from './calc.js'
 
 keypress(process.stdin);
 
@@ -32,6 +33,12 @@ class Room {
         this._y;
         this._w;
         this._h;
+
+        //오브젝트 수
+        this._objCount = 0;
+        this._monster = [];
+        this._player = false;
+        this._item = [];
     }
 }
 
@@ -75,8 +82,7 @@ class Container {
     getRoom(rooms) {
         if (!this._lChild && !this._rChild && this._room)
             rooms.push(this._room);
-        else
-        {
+        else {
             if (this._lChild)
                 this._lChild.getRoom(rooms);
             if (this._rChild)
@@ -99,6 +105,9 @@ const MAX_ROOM_H = 8;
 const MIN_WIDTH = 4;
 const MAX_WIDTH = 6;
 
+//몬스터 수
+const MIN_MONSTER = 3;
+const MAX_MONSTER = 6;
 
 //방 만들기
 function makeRoom(container) {
@@ -150,14 +159,14 @@ function divide(parent) {
     let h = parent._h;
 
     // 분할 비율 정하기
-    let divRatio = Math.floor(Math.random() * (MAX_WIDTH - MIN_WIDTH + 1)) + MIN_WIDTH;
+    let divRatio = Calc.getRandomNum(MIN_WIDTH, MAX_WIDTH);
 
     if (width > height) {   // 가로 길이가 더 클 경우 가로 분할(좌 우)
 
         let slicedW = Math.floor(w * divRatio / 10);
 
         // 사이즈 체크
-        if(!checkSize(parent, width, height)) return;
+        if (!checkSize(parent, width, height)) return;
 
         // lchild
         let lChild = new Container(x, y, slicedW, h);
@@ -172,10 +181,10 @@ function divide(parent) {
         divide(rChild);
 
     } else {    // 세로 분할(위 아래)
-        let slicedH = Math.floor( h * divRatio / 10);
+        let slicedH = Math.floor(h * divRatio / 10);
 
         // 사이즈 체크
-        if(!checkSize(parent, width, height)) return;
+        if (!checkSize(parent, width, height)) return;
 
         // lchild
         let lChild = new Container(x, y, w, slicedH);
@@ -191,6 +200,7 @@ function divide(parent) {
     }
 }
 
+//연결하기
 function connect(root, arr) {
 
     //마지막 컨테이너면 return
@@ -200,32 +210,96 @@ function connect(root, arr) {
     let rCenter = root._rChild.getCenter()
 
     // 센터끼리 연결
-    let road = new Road(new Point(lCenter.x,lCenter.y), new Point(rCenter.x, rCenter.y));
+    let road = new Road(new Point(lCenter.x, lCenter.y), new Point(rCenter.x, rCenter.y));
     root._road = road;
 
     // x 좌표 가 같으면 y를 다르게 하기
-    if (lCenter.x === rCenter.x)
-    {
-        for (let i = lCenter.y ; i < rCenter.y; i++)
-        {
+    if (lCenter.x === rCenter.x) {
+        for (let i = lCenter.y; i < rCenter.y; i++) {
             arr[lCenter.x][i] = '·';
         }
     }
-    else if (lCenter.y === rCenter.y)
-    {
-        for (let i = lCenter.x; i < rCenter.x; i++)
-        {
+    else if (lCenter.y === rCenter.y) {
+        for (let i = lCenter.x; i < rCenter.x; i++) {
             arr[i][lCenter.y] = '·';
         }
     }
-    
+
     //다음 컨테이너 연결
     connect(root._lChild, arr);
     connect(root._rChild, arr);
 }
 
+//room 내에서 위치 잡기
+function getRoomLoc(room) {
+
+    let x = room._x;
+    let y = room._y;
+    let w = room._w;
+    let h = room._h;
+
+    // 방에서 랜덤 위치 받기
+    let xIdx = Calc.getRandomNum(x, x + h -1);
+    let yIdx = Calc.getRandomNum(y, y + w -1);
+
+    return new Point(xIdx, yIdx);
+}
+
+
+//오브젝트 위치 정하기
+function spawnObjects(arr, rooms, player) {
+
+    //몬스터 수 정하기
+    let monsterCnt = Calc.getRandomNum(MIN_MONSTER, MAX_MONSTER);
+
+    //플레이어가 위치할 방 인덱스 정하기
+    let playerLoc = Calc.getRandomNum(0, rooms.length - 1);
+
+    // 순회하면서 플레이어와 몬스터 배치
+    while (monsterCnt > 0) {
+        rooms.forEach((room, idx) => {
+            if (idx === playerLoc )   //플레이어 위치 설정
+            {
+                if(!room._player)   // 한 번 입력되면 건너뛰기
+                {
+                    room._objCount += 1;
+                    room._player = true;
+    
+                    //플레이어 랜덤 위치
+                    const loc = getRoomLoc(room);
+    
+                    player.x = loc.x;
+                    player.y = loc.y;
+    
+                    arr[player.x][player.y] = '●';
+                }
+                
+            }
+            else {
+                if (monsterCnt > 0)  // 몬스터 개수가 남아 있으면
+                {
+                    if (Calc.getRandomNum(0, 1) === 1) {
+                        room._objCount += 1;
+                        //몬스터 위치 선정
+                        let monLoc = getRoomLoc(room);
+
+                        room._monster.push(monLoc);
+
+                        console.log(room, monLoc.x , monLoc.y);
+
+                        arr[monLoc.x][monLoc.y] = '▲';
+
+                        monsterCnt -= 1;
+                    }
+                }
+            }
+        });
+    }
+
+}
+
 //BSP 알고리즘
-function BSP( arr, player) {
+function BSP(arr, player) {
 
     console.clear();
 
@@ -239,24 +313,26 @@ function BSP( arr, player) {
     let rooms = [];
     root.getRoom(rooms);
 
-    for(let room of rooms)
-    {
+    //플레이어, 몬스터 스폰
+    spawnObjects(arr, rooms, player);
+
+
+    for (let room of rooms) {
         const x = room._x;
         const y = room._y;
         const w = room._w;
         const h = room._h;
 
-        for (let i = x; i < x + h; i++)
-            {
-                for (let j = y; j < y + w; j++)
-                {
+        for (let i = x; i < x + h; i++) {
+            for (let j = y; j < y + w; j++) {
+                if (arr[i][j] === '%')
                     arr[i][j] = '·';
-
-                    player.x = i;
-                    player.y = j;
-                }
             }
+        }
     }
+
+    arr[player.x][player.y] = '·';
+
 }
 
 //화면 출력
@@ -279,6 +355,6 @@ export function generateMap(player) {
 
     //BSP 알고리즘 실행
     BSP(arr, player);
-    
+
     return arr;
 }

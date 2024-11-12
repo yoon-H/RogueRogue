@@ -1,4 +1,5 @@
-import {Point} from './map.js'
+import { Point } from './map.js'
+import {Calc} from './calc.js'
 
 
 export class Player {
@@ -13,7 +14,7 @@ export class Player {
         this._equipment = {};       // 장비 칸
         this._statusEffect = {};    // 상태 이상 칸
         this._buffEffect = {};      // 속성 버프 칸
-        this._loc = new Point(0,0);
+        this._loc = new Point(0, 0);
     }
 
     get level() {
@@ -43,7 +44,7 @@ export class Player {
     // 데미지
     get damage() {
         //데미지 값 랜덤 계산
-        let amount = Math.floor(Math.random() * (this._maxDamage - this._minDamage + 1)) + this._minDamage;
+        let amount = Calc.getRandomNum(this._minDamage, this._maxDamage);
 
         return amount;
     }
@@ -75,7 +76,7 @@ export class Player {
     }
 
     attackAmount() {
-        return (this._maxDamage + this._minDamage) /2;
+        return (this._maxDamage + this._minDamage) / 2;
     }
 
 }
