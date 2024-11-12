@@ -1,7 +1,9 @@
 import chalk from 'chalk';
 import figlet from 'figlet';
-import readlineSync from 'readline-sync';
 import { startGame } from "./game.js";
+import keypress from 'keypress';
+
+keypress(process.stdin);
 
 // 로비 화면을 출력하는 함수
 function displayLobby(logs, options, selectedIndex) {
@@ -103,10 +105,10 @@ function select(logs, options, selectedIndex) {
     return new Promise((resolve) => {
         function handleOptionInput(ch, key) {
             if (key) {
-                if (key.name === "up" || ch === '1') {
+                if (key.name === "up" || key.name === "w") {
                     selectedIndex = (selectedIndex - 1 + options.length) % options.length;
                     displayLobby(logs, options, selectedIndex);
-                } else if (key.name === "down" || ch === '2') {
+                } else if (key.name === "down" || key.name === "s") {
                     selectedIndex = (selectedIndex + 1) % options.length;
                     displayLobby(logs, options, selectedIndex);
                 } else if (key.name === "return") {
