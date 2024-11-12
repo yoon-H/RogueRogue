@@ -98,6 +98,9 @@ const MAX_ROOM_H = 8;
 const MIN_WIDTH = 4;
 const MAX_WIDTH = 6;
 
+//몬스터 수
+const MIN_MONSTER = 3;
+const MAX_MONSTER = 5;
 
 //방 만들기
 function makeRoom(container) {
