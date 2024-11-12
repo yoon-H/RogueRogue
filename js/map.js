@@ -1,4 +1,5 @@
 import keypress from 'keypress';
+import {Calc} from './calc.js'
 
 keypress(process.stdin);
 
@@ -152,7 +153,7 @@ function divide(parent) {
     let h = parent._h;
 
     // 분할 비율 정하기
-    let divRatio = getRandomNum(MIN_WIDTH, MAX_WIDTH);
+    let divRatio = Calc.getRandomNum(MIN_WIDTH, MAX_WIDTH);
 
     if (width > height) {   // 가로 길이가 더 클 경우 가로 분할(좌 우)
 
