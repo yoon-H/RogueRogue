@@ -256,12 +256,7 @@ function BSP( arr, player) {
                     player.y = j;
                 }
             }
-
     }
-
-    arr[player.x][player.y] = '●';
-
-    printBoard(arr);
 }
 
 //화면 출력
