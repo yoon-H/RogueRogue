@@ -1,3 +1,5 @@
+import {Calc} from './calc.js'
+
 export class Monster {
     constructor(stage) {
         this._level = stage;
@@ -36,7 +38,7 @@ export class Monster {
     //공격력
     get damage() {
         //데미지 값 랜덤 계산
-        let amount = Math.floor(Math.random() * (this._maxDamage - this._minDamage + 1)) + this._minDamage;
+        let amount = Calc.getRandomNum(this._minDamage, this._maxDamage);
 
         return amount;
     }
