@@ -92,7 +92,7 @@ const MAP_HEIGHT = 20;
 //room 최소, 최대 크기
 const MIN_ROOM_W = 3;
 const MIN_ROOM_H = 3;
-const MAX_ROOM_W = 10;
+const MAX_ROOM_W = 9;
 const MAX_ROOM_H = 8;
 
 //분할 비율
@@ -279,6 +279,6 @@ export function generateMap(player) {
 
     //BSP 알고리즘 실행
     BSP(arr, player);
-
+    
     return arr;
 }
