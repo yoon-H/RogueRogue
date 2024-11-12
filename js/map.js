@@ -75,8 +75,7 @@ class Container {
     getRoom(rooms) {
         if (!this._lChild && !this._rChild && this._room)
             rooms.push(this._room);
-        else
-        {
+        else {
             if (this._lChild)
                 this._lChild.getRoom(rooms);
             if (this._rChild)
@@ -157,7 +156,7 @@ function divide(parent) {
         let slicedW = Math.floor(w * divRatio / 10);
 
         // 사이즈 체크
-        if(!checkSize(parent, width, height)) return;
+        if (!checkSize(parent, width, height)) return;
 
         // lchild
         let lChild = new Container(x, y, slicedW, h);
@@ -172,10 +171,10 @@ function divide(parent) {
         divide(rChild);
 
     } else {    // 세로 분할(위 아래)
-        let slicedH = Math.floor( h * divRatio / 10);
+        let slicedH = Math.floor(h * divRatio / 10);
 
         // 사이즈 체크
-        if(!checkSize(parent, width, height)) return;
+        if (!checkSize(parent, width, height)) return;
 
         // lchild
         let lChild = new Container(x, y, w, slicedH);
@@ -200,32 +199,28 @@ function connect(root, arr) {
     let rCenter = root._rChild.getCenter()
 
     // 센터끼리 연결
-    let road = new Road(new Point(lCenter.x,lCenter.y), new Point(rCenter.x, rCenter.y));
+    let road = new Road(new Point(lCenter.x, lCenter.y), new Point(rCenter.x, rCenter.y));
     root._road = road;
 
     // x 좌표 가 같으면 y를 다르게 하기
-    if (lCenter.x === rCenter.x)
-    {
-        for (let i = lCenter.y ; i < rCenter.y; i++)
-        {
+    if (lCenter.x === rCenter.x) {
+        for (let i = lCenter.y; i < rCenter.y; i++) {
             arr[lCenter.x][i] = '·';
         }
     }
-    else if (lCenter.y === rCenter.y)
-    {
-        for (let i = lCenter.x; i < rCenter.x; i++)
-        {
+    else if (lCenter.y === rCenter.y) {
+        for (let i = lCenter.x; i < rCenter.x; i++) {
             arr[i][lCenter.y] = '·';
         }
     }
-    
+
     //다음 컨테이너 연결
     connect(root._lChild, arr);
     connect(root._rChild, arr);
 }
 
 //BSP 알고리즘
-function BSP( arr, player) {
+function BSP(arr, player) {
 
     console.clear();
 
@@ -239,23 +234,20 @@ function BSP( arr, player) {
     let rooms = [];
     root.getRoom(rooms);
 
-    for(let room of rooms)
-    {
+    for (let room of rooms) {
         const x = room._x;
         const y = room._y;
         const w = room._w;
         const h = room._h;
 
-        for (let i = x; i < x + h; i++)
-            {
-                for (let j = y; j < y + w; j++)
-                {
-                    arr[i][j] = '·';
+        for (let i = x; i < x + h; i++) {
+            for (let j = y; j < y + w; j++) {
+                arr[i][j] = '·';
 
-                    player.x = i;
-                    player.y = j;
-                }
+                player.x = i;
+                player.y = j;
             }
+        }
     }
 }
 
@@ -279,6 +271,6 @@ export function generateMap(player) {
 
     //BSP 알고리즘 실행
     BSP(arr, player);
-    
+
     return arr;
 }

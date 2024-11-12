@@ -27,7 +27,7 @@ async function selectOption(logs, stage, player, monster, options) {
     renderOptions(options, index);
 
     //선택하기
-    index = await select(printValues, options , index);  // resolve를 파라미터로 전달
+    index = await select(printValues, options, index);  // resolve를 파라미터로 전달
 
     return index;
 
@@ -35,7 +35,7 @@ async function selectOption(logs, stage, player, monster, options) {
 
 // 선택하기
 function select(values, options, selectedIndex) {
-    return new Promise ((resolve) => {
+    return new Promise((resolve) => {
         function handleOptionInput(ch, key) {
             if (key) {
                 if (key.name === "up" || ch === '1') {
@@ -79,7 +79,7 @@ function renderOptions(options, selectedIndex) {
             console.log(`  ${option}`);
         }
     });
-    
+
 }
 
 
@@ -195,7 +195,7 @@ const runAway = async () => {
 
 // end로 넘기기
 function confirm() {
-    return new Promise ((resolve) => {
+    return new Promise((resolve) => {
         function handleConfirmInput(ch, key) {
             if (key) {
                 if (key.name === "return") {
