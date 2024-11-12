@@ -1,5 +1,5 @@
 import keypress from 'keypress';
-import {Calc} from './calc.js'
+import { Calc } from './calc.js'
 
 keypress(process.stdin);
 
@@ -33,6 +33,12 @@ class Room {
         this._y;
         this._w;
         this._h;
+
+        //오브젝트 수
+        this._objCount = 0;
+        this._monster = [];
+        this._player = false;
+        this._item = [];
     }
 }
 
@@ -253,6 +259,15 @@ function BSP(arr, player) {
             }
         }
     }
+
+    //TODO :: Spawn
+    // 몬스터 스폰
+
+    // 오브젝트 스폰
+
+    // 플레이어 스폰
+
+
 }
 
 //화면 출력
