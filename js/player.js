@@ -1,3 +1,6 @@
+import {Point} from './map.js'
+
+
 export class Player {
     constructor() {
         this._level = 1;
@@ -10,6 +13,7 @@ export class Player {
         this._equipment = {};       // 장비 칸
         this._statusEffect = {};    // 상태 이상 칸
         this._buffEffect = {};      // 속성 버프 칸
+        this._loc = new Point(0,0);
     }
 
     get level() {
@@ -43,6 +47,16 @@ export class Player {
 
         return amount;
     }
+
+    get loc() {
+        return this._loc;
+    }
+
+    set loc(value) {
+        this._loc = value;
+    }
+
+
 
     takeDamage(damage) {
         this._hp = this._hp - damage;
