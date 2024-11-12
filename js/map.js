@@ -107,7 +107,7 @@ const MAX_WIDTH = 6;
 
 //몬스터 수
 const MIN_MONSTER = 3;
-const MAX_MONSTER = 5;
+const MAX_MONSTER = 6;
 
 //방 만들기
 function makeRoom(container) {
@@ -200,6 +200,7 @@ function divide(parent) {
     }
 }
 
+//연결하기
 function connect(root, arr) {
 
     //마지막 컨테이너면 return
@@ -229,6 +230,74 @@ function connect(root, arr) {
     connect(root._rChild, arr);
 }
 
+//room 내에서 위치 잡기
+function getRoomLoc(room) {
+
+    let x = room._x;
+    let y = room._y;
+    let w = room._w;
+    let h = room._h;
+
+    // 방에서 랜덤 위치 받기
+    let xIdx = Calc.getRandomNum(x, x + h -1);
+    let yIdx = Calc.getRandomNum(y, y + w -1);
+
+    return new Point(xIdx, yIdx);
+}
+
+
+//오브젝트 위치 정하기
+function spawnObjects(arr, rooms, player) {
+
+    //몬스터 수 정하기
+    let monsterCnt = Calc.getRandomNum(MIN_MONSTER, MAX_MONSTER);
+
+    //플레이어가 위치할 방 인덱스 정하기
+    let playerLoc = Calc.getRandomNum(0, rooms.length - 1);
+
+    // 순회하면서 플레이어와 몬스터 배치
+    while (monsterCnt > 0) {
+        rooms.forEach((room, idx) => {
+            if (idx === playerLoc )   //플레이어 위치 설정
+            {
+                if(!room._player)   // 한 번 입력되면 건너뛰기
+                {
+                    room._objCount += 1;
+                    room._player = true;
+    
+                    //플레이어 랜덤 위치
+                    const loc = getRoomLoc(room);
+    
+                    player.x = loc.x;
+                    player.y = loc.y;
+    
+                    arr[player.x][player.y] = '●';
+                }
+                
+            }
+            else {
+                if (monsterCnt > 0)  // 몬스터 개수가 남아 있으면
+                {
+                    if (Calc.getRandomNum(0, 1) === 1) {
+                        room._objCount += 1;
+                        //몬스터 위치 선정
+                        let monLoc = getRoomLoc(room);
+
+                        room._monster.push(monLoc);
+
+                        console.log(room, monLoc.x , monLoc.y);
+
+                        arr[monLoc.x][monLoc.y] = '▲';
+
+                        monsterCnt -= 1;
+                    }
+                }
+            }
+        });
+    }
+
+}
+
 //BSP 알고리즘
 function BSP(arr, player) {
 
@@ -244,6 +313,10 @@ function BSP(arr, player) {
     let rooms = [];
     root.getRoom(rooms);
 
+    //플레이어, 몬스터 스폰
+    spawnObjects(arr, rooms, player);
+
+
     for (let room of rooms) {
         const x = room._x;
         const y = room._y;
@@ -252,21 +325,13 @@ function BSP(arr, player) {
 
         for (let i = x; i < x + h; i++) {
             for (let j = y; j < y + w; j++) {
-                arr[i][j] = '·';
-
-                player.x = i;
-                player.y = j;
+                if (arr[i][j] === '%')
+                    arr[i][j] = '·';
             }
         }
     }
 
-    //TODO :: Spawn
-    // 몬스터 스폰
-
-    // 오브젝트 스폰
-
-    // 플레이어 스폰
-
+    arr[player.x][player.y] = '·';
 
 }
 
