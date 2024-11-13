@@ -70,7 +70,6 @@ function userMoveInput(stage, board, arr, player) {
                 if (key.name === "up" || key.name === "w") { //위로 가기
                     if (checkTile(board, loc.x - 1, loc.y + 0)) {
                         const res = await move(board, arr, -1, 0, loc);
-                        console.log(res);
                         if(res.length > 0 ) {// TODO : Move to battle
                             
                             // 이벤트 삭제
@@ -85,7 +84,6 @@ function userMoveInput(stage, board, arr, player) {
                 } else if (key.name === "down" || key.name === "s") { //아래로 가기
                     if (checkTile(board, loc.x + 1, loc.y + 0)) {
                         const res = await move(board, arr, 1, 0, loc);
-                        console.log(res);
                         if(res.length > 0 ) {// TODO : Move to battle
                             
                             // 이벤트 삭제
@@ -100,7 +98,6 @@ function userMoveInput(stage, board, arr, player) {
                 } else if (key.name === "left" || key.name === "a") { //왼쪽으로 가기
                     if (checkTile(board, loc.x + 0, loc.y - 1)) {
                         const res = await move(board, arr, 0, -1, loc);
-                        console.log(res);
                         if(res.length > 0 ) {// TODO : Move to battle
                             
                             // 이벤트 삭제
@@ -116,7 +113,6 @@ function userMoveInput(stage, board, arr, player) {
                 } else if (key.name === "right" || key.name === "d") { //오른쪽으로 가기
                     if (checkTile(board, loc.x + 0, loc.y + 1)) {
                         const res = await move(board, arr, 0, 1, loc);
-                        console.log(res);
                         if(res.length > 0 ) {// TODO : Move to battle
                             
                             // 이벤트 삭제
