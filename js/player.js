@@ -1,5 +1,5 @@
 import { Point } from './map.js'
-import {Calc} from './calc.js'
+import { Tools } from './tools.js'
 
 
 export class Player {
@@ -44,7 +44,7 @@ export class Player {
     // 데미지
     get damage() {
         //데미지 값 랜덤 계산
-        let amount = Calc.getRandomNum(this._minDamage, this._maxDamage);
+        let amount = Tools.getRandomNum(this._minDamage, this._maxDamage);
 
         return amount;
     }
