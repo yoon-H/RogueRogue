@@ -1,5 +1,5 @@
 import keypress from 'keypress';
-import { Calc } from './calc.js'
+import { Tools } from './tools.js'
 
 keypress(process.stdin);
 
@@ -159,7 +159,7 @@ function divide(parent) {
     let h = parent._h;
 
     // 분할 비율 정하기
-    let divRatio = Calc.getRandomNum(MIN_WIDTH, MAX_WIDTH);
+    let divRatio = Tools.getRandomNum(MIN_WIDTH, MAX_WIDTH);
 
     if (width > height) {   // 가로 길이가 더 클 경우 가로 분할(좌 우)
 
@@ -239,8 +239,8 @@ function getRoomLoc(room) {
     let h = room._h;
 
     // 방에서 랜덤 위치 받기
-    let xIdx = Calc.getRandomNum(x, x + h -1);
-    let yIdx = Calc.getRandomNum(y, y + w -1);
+    let xIdx = Tools.getRandomNum(x, x + h - 1);
+    let yIdx = Tools.getRandomNum(y, y + w - 1);
 
     return new Point(xIdx, yIdx);
 }
@@ -250,42 +250,42 @@ function getRoomLoc(room) {
 function spawnObjects(arr, rooms, player) {
 
     //몬스터 수 정하기
-    let monsterCnt = Calc.getRandomNum(MIN_MONSTER, MAX_MONSTER);
+    let monsterCnt = Tools.getRandomNum(MIN_MONSTER, MAX_MONSTER);
 
     //플레이어가 위치할 방 인덱스 정하기
-    let playerLoc = Calc.getRandomNum(0, rooms.length - 1);
+    let playerLoc = Tools.getRandomNum(0, rooms.length - 1);
 
     // 순회하면서 플레이어와 몬스터 배치
     while (monsterCnt > 0) {
         rooms.forEach((room, idx) => {
-            if (idx === playerLoc )   //플레이어 위치 설정
+            if (idx === playerLoc)   //플레이어 위치 설정
             {
-                if(!room._player)   // 한 번 입력되면 건너뛰기
+                if (!room._player)   // 한 번 입력되면 건너뛰기
                 {
                     room._objCount += 1;
                     room._player = true;
-    
+
                     //플레이어 랜덤 위치
                     const loc = getRoomLoc(room);
-    
+
                     player.x = loc.x;
                     player.y = loc.y;
-    
+
                     arr[player.x][player.y] = '●';
                 }
-                
+
             }
             else {
                 if (monsterCnt > 0)  // 몬스터 개수가 남아 있으면
                 {
-                    if (Calc.getRandomNum(0, 1) === 1) {
+                    if (Tools.getRandomNum(0, 1) === 1) {
                         room._objCount += 1;
                         //몬스터 위치 선정
                         let monLoc = getRoomLoc(room);
 
                         room._monster.push(monLoc);
 
-                        console.log(room, monLoc.x , monLoc.y);
+                        console.log(room, monLoc.x, monLoc.y);
 
                         arr[monLoc.x][monLoc.y] = '▲';
 

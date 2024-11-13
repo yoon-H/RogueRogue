@@ -1,10 +1,10 @@
 import chalk from 'chalk';
 //import readlineSync from 'readline-sync';
 import keypress from 'keypress';
-
 import { Monster } from './monster.js';
 import { GameManager } from './gameManager.js';
 import { start } from "./server.js";
+import { Tools } from './tools.js';
 
 keypress(process.stdin);
 
@@ -92,7 +92,7 @@ function displayScreen(logs, stage, player, monster) {
 
 
 
-//정보 보여주기
+// #region 정보 보여주기
 function displayStatus(stage, player, monster) {
     console.log(chalk.magentaBright(`\n=== Current Status ===`));
     console.log(chalk.cyanBright(`| Stage: ${stage} |\n`));
@@ -119,6 +119,8 @@ function displayStatus(stage, player, monster) {
     console.log(chalk.magentaBright(`=====================\n`));
 }
 
+// #endregion
+
 const battle = async (stage, player, monster) => {
 
     let logs = [];
@@ -131,6 +133,8 @@ const battle = async (stage, player, monster) => {
         //console.clear();
 
         displayScreen(logs, stage, player, monster);
+
+        console.log('screen');
 
         // 탈출 체크
         if (player.isDead) {
@@ -170,56 +174,59 @@ const battle = async (stage, player, monster) => {
 
 };
 
-//분기 처리
+// #region 분기 처리
 const gameOver = async () => {
     console.log(chalk.red(`GAME OVER!`));
 
     console.log(`엔터를 눌러주세요.`);
-    await confirm();
+    await Tools.confirmInput();
 }
 
 const stageClear = async () => {
     console.log(chalk.green(`이겼습니다!`));
 
     console.log(`엔터를 눌러주세요.`);
-    await confirm();
+    await Tools.confirmInput();
 }
 
 const runAway = async () => {
     console.log(chalk.blue(`도망쳤습니다!`));
 
     console.log(`엔터를 눌러주세요.`);
-    await confirm();
-}
-// end 분기 처리
-
-// end로 넘기기
-function confirm() {
-    return new Promise((resolve) => {
-        function handleConfirmInput(ch, key) {
-            if (key) {
-                if (key.name === "return") {
-
-                    //입력 설정(입력 이벤트 제거)
-                    process.stdin.setRawMode(false);
-                    process.stdin.pause();
-                    process.stdin.removeListener("keypress", handleConfirmInput); // 이벤트 리스너 제거
-                    resolve(true); // 선택 완료 후 resolve 호출
-                } else if (key.ctrl && key.name === "c") {
-                    process.exit();
-                }
-            }
-        }
-
-        // 입력 설정
-        process.stdin.on("keypress", handleConfirmInput);
-        process.stdin.setRawMode(true);
-        process.stdin.resume();
-
-    })
-
+    await Tools.confirmInput();
 }
 
+// #endregion 분기 처리
+
+
+
+// #region end로 넘기기
+// function confirm() {
+//     return new Promise((resolve) => {
+//         function handleConfirmInput(ch, key) {
+//             if (key) {
+//                 if (key.name === "return") {
+
+//                     //입력 설정(입력 이벤트 제거)
+//                     process.stdin.setRawMode(false);
+//                     process.stdin.pause();
+//                     process.stdin.removeListener("keypress", handleConfirmInput); // 이벤트 리스너 제거
+//                     resolve(true); // 선택 완료 후 resolve 호출
+//                 } else if (key.ctrl && key.name === "c") {
+//                     process.exit();
+//                 }
+//             }
+//         }
+
+//         // 입력 설정
+//         process.stdin.on("keypress", handleConfirmInput);
+//         process.stdin.setRawMode(true);
+//         process.stdin.resume();
+
+//     })
+
+// }
+// #endregion
 
 
 async function handleUserInput(logs, choice, player, monster) {
@@ -252,11 +259,13 @@ async function handleUserInput(logs, choice, player, monster) {
 
 
 // 게임 시작
-export async function battleLoop(player) {
+export async function battleLoop(stage, num, player) {
     console.clear();
-    let stage = 1;
 
-    while (stage <= 10) {
+    console.log('loop');
+    console.log('num ', num);
+    let hasWon = true;
+    for (let i = 0; i < num; i++) {
         const monster = new Monster(stage);
         let hasWon = await battle(stage, player, monster);
 
@@ -265,16 +274,15 @@ export async function battleLoop(player) {
             GameManager.isGameOver = false;
             player.isDead = false;
             start();
-            break;
         }
 
         // 플레이어 체력 회복
         player.reset();
 
-        // 스테이지 클리어 및 게임 종료 조건
-
-        if (hasWon) {
-            stage++;
-        }
+        //TODO :: map으로 넘기기
+        if(!hasWon) break;
     }
+
+    return hasWon;
+
 }
