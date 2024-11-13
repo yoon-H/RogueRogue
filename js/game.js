@@ -77,7 +77,7 @@ function userMoveInput(stage, board, arr, player) {
                             deleteInput();
 
                             //battle 로그
-                            meetMonster(stage, arr, res, player);
+                            meetMonster(stage, board , arr, res, player);
                         
                         }
                     }
@@ -92,7 +92,7 @@ function userMoveInput(stage, board, arr, player) {
                             deleteInput();
 
                             //battle 로그
-                            meetMonster(stage, arr, res, player);
+                            meetMonster(stage, board, arr, res, player);
                         
                         }
                     }
@@ -107,7 +107,7 @@ function userMoveInput(stage, board, arr, player) {
                             deleteInput();
 
                             //battle 로그
-                            meetMonster(stage, arr, res, player);
+                            meetMonster(stage, board, arr, res, player);
                         
                         }
                     }
@@ -123,7 +123,7 @@ function userMoveInput(stage, board, arr, player) {
                             deleteInput();
 
                             //battle 로그
-                            meetMonster(stage, arr, res, player);
+                            meetMonster(stage, board, arr, res, player);
                         
                         }
                     }
@@ -150,7 +150,7 @@ function userMoveInput(stage, board, arr, player) {
 }
 
 // #region 분기 처리
-const meetMonster = async (stage, map, monsters, player) => {
+const meetMonster = async (stage, board, map, monsters, player) => {
     console.log(chalk.red(`몬스터를 발견했어요!`));
 
     console.log(chalk.gray(`엔터를 눌러주세요.`));
@@ -159,11 +159,14 @@ const meetMonster = async (stage, map, monsters, player) => {
     const res = await battleLoop(stage, monsters.length, player);
 
     if(res) {
-        for(const item of monsters )
+        for(const item of monsters)
         {
             map[item.x][item.y] = '·';
+            board[item.x][item.y] = '·';
         }
     }
+
+    game(stage, player, board, map);
 }
 // #endregion 
 
@@ -174,8 +177,6 @@ async function game(stage, player, board, map) {
     printBoard(map);
 
     await userMoveInput(stage, board, map, player);
-
-
 }
 
 

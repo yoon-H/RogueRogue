@@ -38,11 +38,11 @@ function select(values, options, selectedIndex) {
     return new Promise((resolve) => {
         function handleOptionInput(ch, key) {
             if (key) {
-                if (key.name === "up" || ch === '1') {
+                if (key.name === "up" || key.name === "w") {
                     selectedIndex = (selectedIndex - 1 + options.length) % options.length;
                     displayScreen(values._logs, values._stage, values._player, values._monster);
                     renderOptions(options, selectedIndex);
-                } else if (key.name === "down" || ch === '2') {
+                } else if (key.name === "down" || key.name === "s") {
                     selectedIndex = (selectedIndex + 1) % options.length;
                     displayScreen(values._logs, values._stage, values._player, values._monster);
                     renderOptions(options, selectedIndex);
@@ -134,8 +134,6 @@ const battle = async (stage, player, monster) => {
 
         displayScreen(logs, stage, player, monster);
 
-        console.log('screen');
-
         // 탈출 체크
         if (player.isDead) {
             GameManager.isGameOver = true;
@@ -158,8 +156,6 @@ const battle = async (stage, player, monster) => {
         let actions = ['1. 공격한다.', '2. 도망간다.'];
 
         const choice = await selectOption(logs, stage, player, monster, actions);
-
-        console.log("in battle choice : " + choice);
 
         logs = [];
 
@@ -199,36 +195,6 @@ const runAway = async () => {
 // #endregion 분기 처리
 
 
-
-// #region end로 넘기기
-// function confirm() {
-//     return new Promise((resolve) => {
-//         function handleConfirmInput(ch, key) {
-//             if (key) {
-//                 if (key.name === "return") {
-
-//                     //입력 설정(입력 이벤트 제거)
-//                     process.stdin.setRawMode(false);
-//                     process.stdin.pause();
-//                     process.stdin.removeListener("keypress", handleConfirmInput); // 이벤트 리스너 제거
-//                     resolve(true); // 선택 완료 후 resolve 호출
-//                 } else if (key.ctrl && key.name === "c") {
-//                     process.exit();
-//                 }
-//             }
-//         }
-
-//         // 입력 설정
-//         process.stdin.on("keypress", handleConfirmInput);
-//         process.stdin.setRawMode(true);
-//         process.stdin.resume();
-
-//     })
-
-// }
-// #endregion
-
-
 async function handleUserInput(logs, choice, player, monster) {
     let flag = false;
     switch (choice) {
@@ -262,8 +228,6 @@ async function handleUserInput(logs, choice, player, monster) {
 export async function battleLoop(stage, num, player) {
     console.clear();
 
-    console.log('loop');
-    console.log('num ', num);
     let hasWon = true;
     for (let i = 0; i < num; i++) {
         const monster = new Monster(stage);
