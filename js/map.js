@@ -302,8 +302,6 @@ function spawnObjects(arr, rooms, player) {
 
                         room._monster.push(monLoc);
 
-                        console.log(room, monLoc.x, monLoc.y);
-
                         arr[monLoc.x][monLoc.y] = '▲';
 
                         monsterCnt -= 1;
