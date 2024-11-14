@@ -7,7 +7,7 @@ export class Player {
         this._level = 1;
         this._isDead = false;
         this._MaxHP = 100;
-        this._hp = 100;
+        this._hp = 20;
         this._minDamage = 5;
         this._maxDamage = 10;
         this._speed = 5;

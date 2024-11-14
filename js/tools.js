@@ -8,9 +8,11 @@ export class Tools {
     static confirmInput() {
         return new Promise((resolve) => {
             function handleConfirmInput(ch, key) {
+
+                console.log("confirm : ", key);
                 if (key) {
                     if (key.name === "return") {
-    
+
                         //입력 설정(입력 이벤트 제거)
                         process.stdin.setRawMode(false);
                         process.stdin.pause();
@@ -21,12 +23,12 @@ export class Tools {
                     }
                 }
             }
-    
+
             // 입력 설정
             process.stdin.on("keypress", handleConfirmInput);
             process.stdin.setRawMode(true);
             process.stdin.resume();
-    
+
         })
     }
 }
