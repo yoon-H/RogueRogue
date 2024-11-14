@@ -25,16 +25,19 @@ function move(board, arr, dx, dy, player) {
 }
 
 // 타일 탐색
-function checkTile(arr, x, y) {
+function checkTile(arr, x, y) { // 'wall', 'space' , 'stairs' ,  'none'
 
     if (arr[x][y] === '%') {
-        return false;
+        return 'wall';
     }
     else if (arr[x][y] === '·') {
-        return true;
+        return 'space';
+    }
+    else if (arr[x][y] === '■') {
+        return 'stairs';
     }
     else {
-        return false;
+        return 'none';
     }
 }
 
@@ -50,7 +53,7 @@ function drawMap(board, arr, x, y) {
                 arr[i][j] = board[i][j];
 
                 if (board[i][j] === '▲')
-                    isMonster.push(new Point(i,j));
+                    isMonster.push(new Point(i, j));
             }
         }
     }
@@ -68,65 +71,24 @@ function userMoveInput(stage, board, arr, player) {
             //console.log(key.name);
             if (key) {
                 if (key.name === "up" || key.name === "w") { //위로 가기
-                    if (checkTile(board, loc.x - 1, loc.y + 0)) {
-                        const res = await move(board, arr, -1, 0, loc);
-                        console.log(res);
-                        if(res.length > 0 ) {// TODO : Move to battle
-                            
-                            // 이벤트 삭제
-                            deleteInput();
+                    //분기 처리
+                    InputHandler(stage, board, arr, player, -1, 0);
 
-                            //battle 로그
-                            meetMonster(stage, board , arr, res, player);
-                        
-                        }
-                    }
                     resolve(true);
                 } else if (key.name === "down" || key.name === "s") { //아래로 가기
-                    if (checkTile(board, loc.x + 1, loc.y + 0)) {
-                        const res = await move(board, arr, 1, 0, loc);
-                        console.log(res);
-                        if(res.length > 0 ) {// TODO : Move to battle
-                            
-                            // 이벤트 삭제
-                            deleteInput();
+                    //분기 처리
+                    InputHandler(stage, board, arr, player, 1, 0);
 
-                            //battle 로그
-                            meetMonster(stage, board, arr, res, player);
-                        
-                        }
-                    }
                     resolve(true);
                 } else if (key.name === "left" || key.name === "a") { //왼쪽으로 가기
-                    if (checkTile(board, loc.x + 0, loc.y - 1)) {
-                        const res = await move(board, arr, 0, -1, loc);
-                        console.log(res);
-                        if(res.length > 0 ) {// TODO : Move to battle
-                            
-                            // 이벤트 삭제
-                            deleteInput();
-
-                            //battle 로그
-                            meetMonster(stage, board, arr, res, player);
-                        
-                        }
-                    }
-
+                    //분기 처리
+                    InputHandler(stage, board, arr, player, 0, -1);
+                    
                     resolve(true);
                 } else if (key.name === "right" || key.name === "d") { //오른쪽으로 가기
-                    if (checkTile(board, loc.x + 0, loc.y + 1)) {
-                        const res = await move(board, arr, 0, 1, loc);
-                        console.log(res);
-                        if(res.length > 0 ) {// TODO : Move to battle
-                            
-                            // 이벤트 삭제
-                            deleteInput();
+                    //분기 처리
+                    InputHandler(stage, board, arr, player, 0, 1);
 
-                            //battle 로그
-                            meetMonster(stage, board, arr, res, player);
-                        
-                        }
-                    }
                     resolve(true);
                 } else if (key.ctrl && key.name === "c") {
                     process.exit();
@@ -145,6 +107,29 @@ function userMoveInput(stage, board, arr, player) {
             process.stdin.pause();
             process.stdin.removeListener("keypress", handleMoveInput); // 이벤트 리스너 제거
         }
+
+        const InputHandler = async (stage, board, arr, player, dx, dy) => {
+            switch (checkTile(board, loc.x + dx, loc.y + dy)) {
+                case 'space':
+                    const res = await move(board, arr, dx, dy, loc);
+                    if (res.length > 0) {
+                        // 이벤트 삭제
+                        deleteInput();
+
+                        //battle 로그
+                        meetMonster(stage, board, arr, res, player);
+                    }
+                    break;
+                case 'stairs':
+                    // 이벤트 삭제
+                    deleteInput();
+
+                    //다음 스테이지로 이동
+                    selectStageClear(stage, board, arr, player);
+
+                    break;
+            }
+        }
     })
 
 }
@@ -158,9 +143,8 @@ const meetMonster = async (stage, board, map, monsters, player) => {
 
     const res = await battleLoop(stage, monsters.length, player);
 
-    if(res) {
-        for(const item of monsters)
-        {
+    if (res) {
+        for (const item of monsters) {
             map[item.x][item.y] = '·';
             board[item.x][item.y] = '·';
         }
@@ -168,7 +152,107 @@ const meetMonster = async (stage, board, map, monsters, player) => {
 
     game(stage, player, board, map);
 }
+
+
+// #region 스테이지 옵션 선택하기
+async function selectStage(arr) {
+    let index = 0;
+
+    const actions = ['1. 다음 스테이지로!', '2. 싫어요!'];
+
+    //기존 로그 출력
+    printBoard(arr);
+
+    //옵션 출력
+    renderOptions(actions, index);
+
+    //선택하기
+    index = await select(arr, actions, index);  // resolve를 파라미터로 전달
+
+    return index === 0;
+
+}
+
+//옵션 보여주기
+function renderOptions(options, selectedIndex) {
+    console.log(chalk.red(`다음 스테이지로 넘어갈까요?`));
+
+    options.forEach((option, index) => {
+        if (index === selectedIndex) {
+            console.log(`> ${option}`); // 현재 선택된 항목에 화살표 표시
+        } else {
+            console.log(`  ${option}`);
+        }
+    });
+
+}
+
+// 선택하기
+function select(arr, options, selectedIndex) {
+    return new Promise((resolve) => {
+        function handleOptionInput(ch, key) {
+            if (key) {
+                if (key.name === "up" || key.name === "w") {
+                    selectedIndex = (selectedIndex - 1 + options.length) % options.length;
+                    printBoard(arr);
+                    renderOptions(options, selectedIndex);
+                } else if (key.name === "down" || key.name === "s") {
+                    selectedIndex = (selectedIndex + 1) % options.length;
+                    printBoard(arr);
+                    renderOptions(options, selectedIndex);
+                } else if (key.name === "return") {
+
+                    //입력 설정(입력 이벤트 제거)
+                    process.stdin.setRawMode(false);
+                    process.stdin.pause();
+                    process.stdin.removeListener("keypress", handleOptionInput); // 이벤트 리스너 제거
+                    resolve(selectedIndex); // 선택 완료 후 resolve 호출
+                } else if (key.ctrl && key.name === "c") {
+                    process.exit();
+                }
+            }
+        }
+
+        // 입력 설정
+        process.stdin.on("keypress", handleOptionInput);
+        process.stdin.setRawMode(true);
+        process.stdin.resume();
+
+    })
+
+}
+
+const selectStageClear = async (stage, board, map, player) => {
+
+    const flag = await selectStage(map);
+
+    if (flag) {
+        newStage(stage + 1, player);
+    } else {
+        game(stage, player, board, map);
+    }
+
+}
+
+// #endregion
+
 // #endregion 
+
+// 스테이지 시작 
+async function newStage(stage, player) {
+    // 맵 생성
+    const board = generateMap(player.loc);
+
+    // 시야 맵
+    let map = Array.from(new Array(board.length), () => new Array(board[0].length).fill(' '));
+
+    //처음 맵 그리기
+    drawMap(board, map, player.loc.x, player.loc.y);
+    map[player.loc.x][player.loc.y] = '●';
+
+    game(stage, player, board, map);
+}
+
 
 
 // gameLoop
@@ -184,19 +268,9 @@ async function game(stage, player, board, map) {
 // 게임 시작
 export async function startGame() {
     const player = new Player();
-    
+
     //현재 스테이지
     let stage = 1;
 
-    // 맵 생성
-    const board = generateMap(player.loc);
-
-    // 시야 맵
-    let map = Array.from(new Array(board.length), () => new Array(board[0].length).fill(' '));
-
-    //처음 맵 그리기
-    drawMap(board, map, player.loc.x, player.loc.y);
-    map[player.loc.x][player.loc.y] = '●';
-
-    game(stage, player, board, map);
+    newStage(stage, player);
 }
