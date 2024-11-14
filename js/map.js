@@ -253,7 +253,6 @@ function getRoomLoc(arr, room) {
 
 //오브젝트 위치 정하기
 function spawnObjects(arr, rooms, player) {
-
     //몬스터 수 정하기
     let monsterCnt = Tools.getRandomNum(MIN_MONSTER, MAX_MONSTER);
 
@@ -315,9 +314,6 @@ function spawnObjects(arr, rooms, player) {
 
 //BSP 알고리즘
 function BSP(arr, player) {
-
-    console.clear();
-
     const root = new Container(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
     //범위 나누고 길 만들기
@@ -352,7 +348,7 @@ function BSP(arr, player) {
 
 //화면 출력
 export function printBoard(arr) {
-    console.clear();
+    //console.clear();
 
     for (let row of arr) {
         let text = '';
@@ -367,9 +363,8 @@ export function printBoard(arr) {
 
 export function generateMap(player) {
     let arr = Array.from(new Array(MAP_HEIGHT), () => new Array(MAP_WIDTH).fill('%'));
-
+    
     //BSP 알고리즘 실행
     BSP(arr, player);
-
     return arr;
 }

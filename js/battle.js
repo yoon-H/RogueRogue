@@ -9,19 +9,18 @@ import { Tools } from './tools.js';
 keypress(process.stdin);
 
 
-async function selectOption(logs, stage, player, monster, options) {
+async function selectOption(logs, player, monster, options) {
     let index = 0;
 
     let printValues = {
         _logs: logs,
-        _stage: stage,
         _player: player,
         _monster: monster
     }
 
 
     //기존 로그 출력
-    displayScreen(logs, stage, player, monster);
+    displayScreen(logs, player, monster);
 
     //옵션 출력
     renderOptions(options, index);
@@ -40,11 +39,11 @@ function select(values, options, selectedIndex) {
             if (key) {
                 if (key.name === "up" || key.name === "w") {
                     selectedIndex = (selectedIndex - 1 + options.length) % options.length;
-                    displayScreen(values._logs, values._stage, values._player, values._monster);
+                    displayScreen(values._logs, values._player, values._monster);
                     renderOptions(options, selectedIndex);
                 } else if (key.name === "down" || key.name === "s") {
                     selectedIndex = (selectedIndex + 1) % options.length;
-                    displayScreen(values._logs, values._stage, values._player, values._monster);
+                    displayScreen(values._logs, values._player, values._monster);
                     renderOptions(options, selectedIndex);
                 } else if (key.name === "return") {
 
@@ -84,18 +83,18 @@ function renderOptions(options, selectedIndex) {
 
 
 
-function displayScreen(logs, stage, player, monster) {
+function displayScreen(logs, player, monster) {
     console.clear();
-    displayStatus(stage, player, monster);
+    displayStatus(player, monster);
     logs.forEach((log) => console.log(log));
 }
 
 
 
 // #region 정보 보여주기
-function displayStatus(stage, player, monster) {
+function displayStatus( player, monster) {
     console.log(chalk.magentaBright(`\n=== Current Status ===`));
-    console.log(chalk.cyanBright(`| Stage: ${stage} |\n`));
+    console.log(chalk.cyanBright(`| Stage: ${GameManager.currentStage} |\n`));
     console.log(chalk.blueBright(
         `
 | 플레이어 정보
@@ -121,7 +120,7 @@ function displayStatus(stage, player, monster) {
 
 // #endregion
 
-const battle = async (stage, player, monster) => {
+const battle = async (player, monster) => {
 
     let logs = [];
 
@@ -132,7 +131,7 @@ const battle = async (stage, player, monster) => {
     while (!GameManager.isGameOver) {
         //console.clear();
 
-        displayScreen(logs, stage, player, monster);
+        displayScreen(logs, player, monster);
 
         // 탈출 체크
         if (player.isDead) {
@@ -155,7 +154,7 @@ const battle = async (stage, player, monster) => {
 
         let actions = ['1. 공격한다.', '2. 도망간다.'];
 
-        const choice = await selectOption(logs, stage, player, monster, actions);
+        const choice = await selectOption(logs, player, monster, actions);
 
         logs = [];
 
@@ -225,19 +224,21 @@ async function handleUserInput(logs, choice, player, monster) {
 
 
 // 게임 시작
-export async function battleLoop(stage, num, player) {
+export async function battleLoop( num, player) {
     console.clear();
+
+    const stage = GameManager.currentStage;
 
     let hasWon = true;
     for (let i = 0; i < num; i++) {
         const monster = new Monster(stage);
-        let hasWon = await battle(stage, player, monster);
+        let hasWon = await battle(player, monster);
 
         //GameOver
         if (GameManager.isGameOver) {
-            GameManager.isGameOver = false;
+            GameManager.isGameOver = true;
             player.isDead = false;
-            start();
+            return;
         }
 
         // 플레이어 체력 회복

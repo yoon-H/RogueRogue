@@ -2,6 +2,7 @@ import chalk from 'chalk';
 import figlet from 'figlet';
 import { startGame } from "./game.js";
 import keypress from 'keypress';
+import { GameManager } from './gameManager.js';
 
 keypress(process.stdin);
 
@@ -159,6 +160,9 @@ function printLog(logs) {
 
 // 게임 시작 함수
 export async function start() {
+
+    GameManager.isGameOver = false;
+    GameManager.currentStage = 1;
     let logs = { color: '', text: '' };
     let actions = [' 새로운 게임 시작', ' 업적 확인하기', ' 옵션', ' 종료'];
 
