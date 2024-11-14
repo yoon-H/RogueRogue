@@ -231,7 +231,7 @@ function connect(root, arr) {
 }
 
 //room 내에서 위치 잡기
-function getRoomLoc(room) {
+function getRoomLoc(arr, room) {
 
     let x = room._x;
     let y = room._y;
@@ -239,8 +239,13 @@ function getRoomLoc(room) {
     let h = room._h;
 
     // 방에서 랜덤 위치 받기
-    let xIdx = Tools.getRandomNum(x, x + h - 1);
-    let yIdx = Tools.getRandomNum(y, y + w - 1);
+    let xIdx;
+    let yIdx;
+
+    do {
+        xIdx =Tools.getRandomNum(x, x + h - 1);
+        yIdx = Tools.getRandomNum(y, y + w - 1);
+    }while (arr[xIdx][yIdx] !== '%')
 
     return new Point(xIdx, yIdx);
 }
@@ -255,6 +260,8 @@ function spawnObjects(arr, rooms, player) {
     //플레이어가 위치할 방 인덱스 정하기
     let playerLoc = Tools.getRandomNum(0, rooms.length - 1);
 
+    let hasClear = false;
+
     // 순회하면서 플레이어와 몬스터 배치
     while (monsterCnt > 0) {
         rooms.forEach((room, idx) => {
@@ -266,7 +273,7 @@ function spawnObjects(arr, rooms, player) {
                     room._player = true;
 
                     //플레이어 랜덤 위치
-                    const loc = getRoomLoc(room);
+                    const loc = getRoomLoc(arr, room);
 
                     player.x = loc.x;
                     player.y = loc.y;
@@ -276,12 +283,22 @@ function spawnObjects(arr, rooms, player) {
 
             }
             else {
-                if (monsterCnt > 0)  // 몬스터 개수가 남아 있으면
-                {
+
+                if (!hasClear) {//이동 계단 만들기
+                    if(Tools.getRandomNum(0, 1) === 1) {
+                        const clearLoc = getRoomLoc(arr, room);
+
+                        arr[clearLoc.x][clearLoc.y] = '■';
+
+                        hasClear = true;
+                    }
+                }
+
+                if (monsterCnt > 0) {// 몬스터 개수가 남아 있으면
                     if (Tools.getRandomNum(0, 1) === 1) {
                         room._objCount += 1;
                         //몬스터 위치 선정
-                        let monLoc = getRoomLoc(room);
+                        let monLoc = getRoomLoc(arr, room);
 
                         room._monster.push(monLoc);
 
