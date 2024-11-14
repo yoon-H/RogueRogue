@@ -71,138 +71,23 @@ function userMoveInput(stage, board, arr, player) {
             //console.log(key.name);
             if (key) {
                 if (key.name === "up" || key.name === "w") { //위로 가기
-                    switch (checkTile(board, loc.x - 1, loc.y + 0)) {
-                        case 'space':
-                            const res = await move(board, arr, -1, 0, loc);
-                            if (res.length > 0) {// TODO : Move to battle
+                    //분기 처리
+                    InputHandler(stage, board, arr, player, -1, 0);
 
-                                // 이벤트 삭제
-                                deleteInput();
-
-                                //battle 로그
-                                meetMonster(stage, board, arr, res, player);
-
-                            }
-                            break;
-                        case 'stairs':
-                            // 이벤트 삭제
-                            deleteInput();
-
-                            //다음 스테이지로 이동
-                            selectStageClear(stage, board, arr, player);
-
-                            break;
-                    }
                     resolve(true);
                 } else if (key.name === "down" || key.name === "s") { //아래로 가기
-                    switch (checkTile(board, loc.x + 1, loc.y + 0)) {
-                        case 'space':
-                            const res = await move(board, arr, 1, 0, loc);
-                            if (res.length > 0) {// TODO : Move to battle
+                    //분기 처리
+                    InputHandler(stage, board, arr, player, 1, 0);
 
-                                // 이벤트 삭제
-                                deleteInput();
-
-                                //battle 로그
-                                meetMonster(stage, board, arr, res, player);
-
-                            }
-                            break;
-                        case 'stairs':
-                            // 이벤트 삭제
-                            deleteInput();
-
-                            //다음 스테이지로 이동
-                            selectStageClear(stage, board, arr, player);
-
-                            break;
-                    }
-                    // if (checkTile(board, loc.x + 1, loc.y + 0) === 'space') {
-                    //     const res = await move(board, arr, 1, 0, loc);
-                    //     if (res.length > 0) {// TODO : Move to battle
-
-                    //         // 이벤트 삭제
-                    //         deleteInput();
-
-                    //         //battle 로그
-                    //         meetMonster(stage, board, arr, res, player);
-
-                    //     }
-                    // }
                     resolve(true);
                 } else if (key.name === "left" || key.name === "a") { //왼쪽으로 가기
-                    switch (checkTile(board, loc.x, loc.y - 1)) {
-                        case 'space':
-                            const res = await move(board, arr, 0, -1, loc);
-                            if (res.length > 0) {// TODO : Move to battle
-
-                                // 이벤트 삭제
-                                deleteInput();
-
-                                //battle 로그
-                                meetMonster(stage, board, arr, res, player);
-
-                            }
-                            break;
-                        case 'stairs':
-                            // 이벤트 삭제
-                            deleteInput();
-
-                            //다음 스테이지로 이동
-                            selectStageClear(stage, board, arr, player);
-
-                            break;
-                    }
-
-                    // if (checkTile(board, loc.x + 0, loc.y - 1) === 'space') {
-                    //     const res = await move(board, arr, 0, -1, loc);
-                    //     if (res.length > 0) {// TODO : Move to battle
-
-                    //         // 이벤트 삭제
-                    //         deleteInput();
-
-                    //         //battle 로그
-                    //         meetMonster(stage, board, arr, res, player);
-
-                    //     }
-                    // }
-
+                    //분기 처리
+                    InputHandler(stage, board, arr, player, 0, -1);
+                    
                     resolve(true);
                 } else if (key.name === "right" || key.name === "d") { //오른쪽으로 가기
-                    switch (checkTile(board, loc.x, loc.y + 1)) {
-                        case 'space':
-                            const res = await move(board, arr, 0, 1, loc);
-                            if (res.length > 0) {// TODO : Move to battle
-
-                                // 이벤트 삭제
-                                deleteInput();
-
-                                //battle 로그
-                                meetMonster(stage, board, arr, res, player);
-
-                            }
-                            break;
-                        case 'stairs':
-                            // 이벤트 삭제
-                            deleteInput();
-
-                            //다음 스테이지로 이동
-                            selectStageClear(stage, board, arr, player);
-
-                            break;
-                    }
-                    // if (checkTile(board, loc.x + 0, loc.y + 1) === 'space') {
-                    //     const res = await move(board, arr, 0, 1, loc);
-                    //     if (res.length > 0) {// TODO : Move to battle
-
-                    //         // 이벤트 삭제
-                    //         deleteInput();
-
-                    //         //battle 로그
-                    //         meetMonster(stage, board, arr, res, player);
-
-                    //     }
-                    // }
+                    //분기 처리
+                    InputHandler(stage, board, arr, player, 0, 1);
 
                     resolve(true);
                 } else if (key.ctrl && key.name === "c") {
@@ -221,6 +106,29 @@ function userMoveInput(stage, board, arr, player) {
             process.stdin.setRawMode(false);
             process.stdin.pause();
             process.stdin.removeListener("keypress", handleMoveInput); // 이벤트 리스너 제거
+        }
+
+        const InputHandler = async (stage, board, arr, player, dx, dy) => {
+            switch (checkTile(board, loc.x + dx, loc.y + dy)) {
+                case 'space':
+                    const res = await move(board, arr, dx, dy, loc);
+                    if (res.length > 0) {
+                        // 이벤트 삭제
+                        deleteInput();
+
+                        //battle 로그
+                        meetMonster(stage, board, arr, res, player);
+                    }
+                    break;
+                case 'stairs':
+                    // 이벤트 삭제
+                    deleteInput();
+
+                    //다음 스테이지로 이동
+                    selectStageClear(stage, board, arr, player);
+
+                    break;
+            }
         }
     })
 
