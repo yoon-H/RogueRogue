@@ -4,9 +4,9 @@ export class Monster {
     constructor(stage) {
         this._level = stage;
         this._isDead = false;
-        this._hp = 60 + (10 * (stage - 1));
-        this._minDamage = 12 + (5 * (stage - 1));
-        this._maxDamage = 12 + (5 * (stage - 1));
+        this._hp = 20 + (10 * (stage - 1));
+        this._minDamage = 1 + (5 * (stage - 1));
+        this._maxDamage = 4 + (5 * (stage - 1));
         this._speed = 5;
         this._equipment = {};       // 장비 칸
         this._statusEffect = {};    // 상태 이상 칸

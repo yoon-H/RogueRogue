@@ -13,7 +13,7 @@ function displayLobby(logs, options, selectedIndex) {
     // 타이틀 텍스트
     console.log(
         chalk.cyan(
-            figlet.textSync('RL- Javascript', {
+            figlet.textSync('RogueRogue', {
                 font: 'Standard',
                 horizontalLayout: 'default',
                 verticalLayout: 'default'
@@ -24,9 +24,6 @@ function displayLobby(logs, options, selectedIndex) {
     // 상단 경계선
     const line = chalk.magentaBright('='.repeat(50));
     console.log(line);
-
-    // 게임 이름
-    console.log(chalk.yellowBright.bold('CLI 게임에 오신것을 환영합니다!'));
 
     // 설명 텍스트
     console.log(chalk.green('옵션을 선택해주세요.'));
@@ -63,18 +60,6 @@ function handleUserInput(logs, choice) {
             return true;
             break;
         case '2':
-            logs.color = 'yellow';
-            logs.text = '구현 준비중입니다.. 게임을 시작하세요';
-            // 업적 확인하기 로직을 구현
-            return false;
-            break;
-        case '3':
-            logs.color = 'blue';
-            logs.text = '구현 준비중입니다.. 게임을 시작하세요';
-            // 옵션 메뉴 로직을 구현
-            return false;
-            break;
-        case '4':
             console.log(chalk.red('게임을 종료합니다.'));
             // 게임 종료 로직을 구현
             process.exit(0); // 게임 종료
@@ -164,7 +149,7 @@ export async function start() {
     GameManager.isGameOver = false;
     GameManager.currentStage = 1;
     let logs = { color: '', text: '' };
-    let actions = [' 새로운 게임 시작', ' 업적 확인하기', ' 옵션', ' 종료'];
+    let actions = [' 새로운 게임 시작', ' 종료'];
 
     displayLobby(logs, actions, 0);
     await selectList(logs, actions);

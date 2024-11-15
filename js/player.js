@@ -7,9 +7,9 @@ export class Player {
         this._level = 1;
         this._isDead = false;
         this._MaxHP = 100;
-        this._hp = 20;
-        this._minDamage = 5;
-        this._maxDamage = 10;
+        this._hp = 40;
+        this._minDamage = 2;
+        this._maxDamage = 3;
         this._speed = 5;
         this._equipment = {};       // 장비 칸
         this._statusEffect = {};    // 상태 이상 칸

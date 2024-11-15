@@ -68,7 +68,6 @@ function userMoveInput(board, arr, player) {
 
     return new Promise((resolve) => {
         async function handleMoveInput(ch, key) {
-            console.log("move : ", key.name);
             if (key) {
                 if (key.name === "up" || key.name === "w") { //위로 가기
                     //분기 처리
@@ -253,6 +252,9 @@ function newStage(player) {
 }
 
 
+//Show Status
+
+
 
 // gameLoop
 async function game(stage, player) {
@@ -269,8 +271,6 @@ async function game(stage, player) {
 
             //맵 그리기
             printBoard(map);
-
-            console.log('loop');
 
             //입력 처리
             await userMoveInput(board, map, player);

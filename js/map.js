@@ -348,7 +348,7 @@ function BSP(arr, player) {
 
 //화면 출력
 export function printBoard(arr) {
-    //console.clear();
+    console.clear();
 
     for (let row of arr) {
         let text = '';

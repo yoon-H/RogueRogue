@@ -8,8 +8,6 @@ export class Tools {
     static confirmInput() {
         return new Promise((resolve) => {
             function handleConfirmInput(ch, key) {
-
-                console.log("confirm : ", key);
                 if (key) {
                     if (key.name === "return") {
 
