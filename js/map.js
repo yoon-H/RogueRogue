@@ -109,6 +109,10 @@ const MAX_WIDTH = 6;
 const MIN_MONSTER = 3;
 const MAX_MONSTER = 6;
 
+//아이템 수
+const MIN_ITEM = 4;
+const MAX_ITEM = 7;
+
 //방 만들기
 function makeRoom(container) {
 
@@ -312,6 +316,24 @@ function spawnObjects(arr, rooms, player) {
 
 }
 
+// 아이템 스폰
+function spawnItem(arr) {
+    const height = arr.length;
+    const width = arr[0].length;
+
+    let itemCount = Tools.getRandomNum(MIN_ITEM, MAX_ITEM);
+
+    while(itemCount > 0) {
+        const x = Tools.getRandomNum(3, height -3);
+        const y = Tools.getRandomNum(3, width -3);
+
+        if(arr[x][y] === '·') {
+            arr[x][y] = '♥';
+            itemCount -=1;
+        }
+    }
+}
+
 //BSP 알고리즘
 function BSP(arr, player) {
     const root = new Container(0, 0, MAP_WIDTH, MAP_HEIGHT);
@@ -327,7 +349,6 @@ function BSP(arr, player) {
     //플레이어, 몬스터 스폰
     spawnObjects(arr, rooms, player);
 
-
     for (let room of rooms) {
         const x = room._x;
         const y = room._y;
@@ -341,6 +362,8 @@ function BSP(arr, player) {
             }
         }
     }
+
+    spawnItem(arr);
 
     arr[player.x][player.y] = '·';
 

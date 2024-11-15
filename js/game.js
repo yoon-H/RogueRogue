@@ -36,6 +36,9 @@ function checkTile(arr, x, y) { // 'wall', 'space' , 'stairs' ,  'none'
     else if (arr[x][y] === '■') {
         return 'stairs';
     }
+    else if (arr[x][y] === '♥') {
+        return 'item'
+    }
     else {
         return 'none';
     }
@@ -109,13 +112,31 @@ function userMoveInput(board, arr, player) {
             switch (checkTile(board, loc.x + dx, loc.y + dy)) {
                 case 'space':
                     const res = move(board, arr, dx, dy, loc);
-                    console.log(res);
                     if (res.length > 0) {
-                        
+
                         //battle 로그
                         await meetMonster(board, arr, res, player);
                     }
                     break;
+                case 'item':
+                    const item = Tools.getItem();
+
+                    player.inventory[item] += 1;
+
+                    console.log(`엔터를 눌러주세요.`);
+                    await Tools.confirmInput();
+
+                    board[loc.x + dx][loc.y + dy] = '·';
+
+                    const result = move(board, arr, dx, dy, loc);
+                    if (result.length > 0) {
+
+                        //battle 로그
+                        await meetMonster(board, arr, result, player);
+                    }
+
+                    break;
+
                 case 'stairs':
 
                     //다음 스테이지로 이동
