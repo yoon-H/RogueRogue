@@ -36,6 +36,9 @@ function checkTile(arr, x, y) { // 'wall', 'space' , 'stairs' ,  'none'
     else if (arr[x][y] === '■') {
         return 'stairs';
     }
+    else if (arr[x][y] === '♥') {
+        return 'item'
+    }
     else {
         return 'none';
     }
@@ -109,17 +112,35 @@ function userMoveInput(board, arr, player) {
             switch (checkTile(board, loc.x + dx, loc.y + dy)) {
                 case 'space':
                     const res = move(board, arr, dx, dy, loc);
-                    console.log(res);
                     if (res.length > 0) {
-                        
+
                         //battle 로그
                         await meetMonster(board, arr, res, player);
                     }
                     break;
+                case 'item':
+                    const item = Tools.getItem();
+
+                    player.inventory[item] += 1;
+
+                    console.log(`엔터를 눌러주세요.`);
+                    await Tools.confirmInput();
+
+                    board[loc.x + dx][loc.y + dy] = '·';
+
+                    const result = move(board, arr, dx, dy, loc);
+                    if (result.length > 0) {
+
+                        //battle 로그
+                        await meetMonster(board, arr, result, player);
+                    }
+
+                    break;
+
                 case 'stairs':
 
                     //다음 스테이지로 이동
-                    await selectStageClear(arr);
+                    await selectStageClear(arr, player);
 
                     break;
             }
@@ -131,7 +152,7 @@ function userMoveInput(board, arr, player) {
 // #region 분기 처리
 const meetMonster = async (board, map, monsters, player) => {
 
-    printBoard(map);
+    showScreen(map, player)
 
     console.log(chalk.red(`몬스터를 발견했어요!`));
 
@@ -152,19 +173,19 @@ const meetMonster = async (board, map, monsters, player) => {
 
 
 // #region 스테이지 옵션 선택하기
-async function selectStage(arr) {
+async function selectStage(arr, player) {
     let index = 0;
 
     const actions = ['1. 다음 스테이지로!', '2. 싫어요!'];
 
     //기존 로그 출력
-    printBoard(arr);
+    showScreen(arr, player);
 
     //옵션 출력
     renderOptions(actions, index);
 
     //선택하기
-    index = await select(arr, actions, index);  // resolve를 파라미터로 전달
+    index = await select(arr, actions, index, player);  // resolve를 파라미터로 전달
 
     return index === 0;
 
@@ -185,17 +206,17 @@ function renderOptions(options, selectedIndex) {
 }
 
 // 선택하기
-function select(arr, options, selectedIndex) {
+function select(arr, options, selectedIndex, player) {
     return new Promise((resolve) => {
         function handleOptionInput(ch, key) {
             if (key) {
                 if (key.name === "up" || key.name === "w") {
                     selectedIndex = (selectedIndex - 1 + options.length) % options.length;
-                    printBoard(arr);
+                    showScreen(arr, player);
                     renderOptions(options, selectedIndex);
                 } else if (key.name === "down" || key.name === "s") {
                     selectedIndex = (selectedIndex + 1) % options.length;
-                    printBoard(arr);
+                    showScreen(arr, player);
                     renderOptions(options, selectedIndex);
                 } else if (key.name === "return") {
 
@@ -219,9 +240,9 @@ function select(arr, options, selectedIndex) {
 
 }
 
-const selectStageClear = async (map) => {
+const selectStageClear = async (map, player) => {
 
-    const flag = await selectStage(map);
+    const flag = await selectStage(map, player);
 
     if (flag) {
         GameManager.currentStage += 1;
@@ -265,6 +286,9 @@ function showScreen(map, player) {
 function displayStatus(player) {
     console.log(chalk.magentaBright(`\n=== Current Status ===`));
     console.log(chalk.cyanBright(`| Stage: ${GameManager.currentStage} | 플레이어 정보 | HP : ${player.hp} | `));
+    console.log(chalk.cyanBright(
+        `| Item   : 공격력 아이템 ${player.inventory['attack']} 개, 체력 아이템 ${player.inventory['hp']} 개, 연막탄 ${player.inventory['smoke']} 개, 회복약 ${player.inventory['heal']} 개`
+    ));
     console.log(chalk.magentaBright(`=====================\n`));
 }
 

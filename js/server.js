@@ -22,10 +22,25 @@ function displayLobby(logs, options, selectedIndex) {
     );
 
     // 상단 경계선
-    const line = chalk.magentaBright('='.repeat(50));
+    const line = chalk.magentaBright('='.repeat(60));
     console.log(line);
 
     // 설명 텍스트
+    console.log('이 게임은 키보드의 화살표나 wasd, 엔터키로만 진행됩니다.');
+    console.log('맵에는 총 6가지 기호가 등장합니다.');
+    console.log(`'%'는 벽, '·'는 갈 수 있는 곳, '●'는 플레이어입니다. `);
+    console.log(`'■'는 다음 스테이지로 가는 계단, '♥'는 아이템, '▲'는 몬스터입니다. `);
+    console.log();
+
+    console.log(`아이템은 4종류입니다. `);
+    console.log(`공격력, 체력 아이템은 3개를 모으면 플레이어의 각 스탯이 증가합니다.`);
+    console.log(`연막탄을 사용하면 반드시 도망칠 수 있고,`);
+    console.log(`회복약을 사용하면 체력을 일부 회복합니다.`);
+
+    console.log(`밸런스는 전혀 생각하지 않은 게임! 로그로그 시작합니다!`);
+
+    console.log();
+
     console.log(chalk.green('옵션을 선택해주세요.'));
     console.log();
 
