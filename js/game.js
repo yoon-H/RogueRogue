@@ -281,6 +281,9 @@ async function game(stage, player) {
         //새로운 스테이지 생성
         let { board, map } = newStage(player);
 
+        // 플레이어 체력 회복
+        player.reset();
+
         while (!GameManager.isGameOver && GameManager.currentStage === stage) {
 
             showScreen(map, player);

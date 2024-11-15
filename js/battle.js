@@ -245,10 +245,6 @@ export async function battleLoop(num, player) {
             return;
         }
 
-        // 플레이어 체력 회복
-        player.reset();
-
-        //TODO :: map으로 넘기기
         if(!hasWon) break;
     }
 
