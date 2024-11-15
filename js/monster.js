@@ -2,19 +2,10 @@ import { Tools } from './tools.js'
 
 export class Monster {
     constructor(stage) {
-        this._level = stage;
         this._isDead = false;
         this._hp = 20 + (10 * (stage - 1));
         this._minDamage = 1 + (5 * (stage - 1));
         this._maxDamage = 4 + (5 * (stage - 1));
-        this._speed = 5;
-        this._equipment = {};       // 장비 칸
-        this._statusEffect = {};    // 상태 이상 칸
-        this._buffEffect = {};      // 속성 버프 칸
-    }
-
-    get level() {
-        return this._level;
     }
 
     get isDead() {
@@ -48,8 +39,9 @@ export class Monster {
 
         if (this._hp <= 0) {
             this._hp = 0;
-            //TODO give exp
-            //TODO give random item
+
+            //TODO random item
+
 
             this._isDead = true; //dead
         }

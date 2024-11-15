@@ -251,8 +251,22 @@ function newStage(player) {
     }
 }
 
+//Show Screen
+function showScreen(map, player) {
+
+    //맵 그리기
+    printBoard(map);
+
+    //상태 그리기
+    displayStatus(player);
+}
 
 //Show Status
+function displayStatus(player) {
+    console.log(chalk.magentaBright(`\n=== Current Status ===`));
+    console.log(chalk.cyanBright(`| Stage: ${GameManager.currentStage} | 플레이어 정보 | HP : ${player.hp} | `));
+    console.log(chalk.magentaBright(`=====================\n`));
+}
 
 
 
@@ -269,8 +283,7 @@ async function game(stage, player) {
 
         while (!GameManager.isGameOver && GameManager.currentStage === stage) {
 
-            //맵 그리기
-            printBoard(map);
+            showScreen(map, player);
 
             //입력 처리
             await userMoveInput(board, map, player);

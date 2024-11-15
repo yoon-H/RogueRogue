@@ -81,8 +81,6 @@ function renderOptions(options, selectedIndex) {
 
 }
 
-
-
 function displayScreen(logs, player, monster) {
     console.clear();
     displayStatus(player, monster);
@@ -107,7 +105,6 @@ function displayStatus(player, monster) {
     console.log(chalk.redBright(`
 | 몬스터 정보
 ----------------
-| LEVEL  : ${monster.level} 
 | HP     : ${monster.hp}
 | Attack : ${monster.attackAmount()}
 \n`
