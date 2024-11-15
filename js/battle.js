@@ -203,13 +203,21 @@ async function handleUserInput(logs, choice, player, monster) {
             let monsterDamage = monster.damage;
             player.takeDamage(monsterDamage);
 
-            logs.push(chalk.red(`${monster.damage}만큼 공격 당했습니다!`));
+            logs.push(chalk.red(`${monsterDamage}만큼 공격 당했습니다!`));
 
             logs.push('\n');
             break;
 
         case 1:   // run away
-            flag = true;
+            if(Tools.getRandomNum(0,1) === 0){
+                flag = true;
+            } else {
+                logs.push(chalk.magentaBright(`히히 못 가!`));
+
+                let monsterDamage = monster.damage;
+                player.takeDamage(monsterDamage);
+                logs.push(chalk.red(`${monsterDamage}만큼 공격 당했습니다!`));
+            }
             break;
 
     }
