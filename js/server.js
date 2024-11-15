@@ -146,8 +146,7 @@ function printLog(logs) {
 // 게임 시작 함수
 export async function start() {
 
-    GameManager.isGameOver = false;
-    GameManager.currentStage = 1;
+    GameManager.reset();
     let logs = { color: '', text: '' };
     let actions = [' 새로운 게임 시작', ' 종료'];
 
