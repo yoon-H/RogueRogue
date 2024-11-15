@@ -63,10 +63,10 @@ export class Player {
     }
 
     takeDamage(damage) {
-        this.hp = this.hp - damage;
+        this._hp = this._hp - damage;
 
-        if (this.hp <= 0) {
-            this.hp = 0;
+        if (this._hp <= 0) {
+            this._hp = 0;
 
             this.isDead = true; //dead
         }
@@ -78,6 +78,12 @@ export class Player {
 
     attackAmount() {
         return Math.floor((this.maxDamage + this.minDamage) / 2);
+    }
+
+    useHealItem() {
+        this._hp += Math.floor(this.MaxHp * 5 / 10);
+
+        if(this._hp > this.MaxHp) this._hp = this.MaxHp;
     }
 
 }

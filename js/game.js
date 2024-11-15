@@ -265,6 +265,9 @@ function showScreen(map, player) {
 function displayStatus(player) {
     console.log(chalk.magentaBright(`\n=== Current Status ===`));
     console.log(chalk.cyanBright(`| Stage: ${GameManager.currentStage} | 플레이어 정보 | HP : ${player.hp} | `));
+    console.log(chalk.cyanBright(
+        `| Item   : 공격력 아이템 ${player.inventory['attack']} 개, 체력 아이템 ${player.inventory['hp']} 개, 연막탄 ${player.inventory['smoke']} 개, 회복약 ${player.inventory['heal']} 개`
+    ));
     console.log(chalk.magentaBright(`=====================\n`));
 }
 

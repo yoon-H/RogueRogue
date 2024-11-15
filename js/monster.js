@@ -40,9 +40,6 @@ export class Monster {
         if (this._hp <= 0) {
             this._hp = 0;
 
-            //TODO random item
-
-
             this._isDead = true; //dead
         }
     }

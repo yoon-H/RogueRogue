@@ -99,6 +99,7 @@ function displayStatus(player, monster) {
 ----------------
 | HP     : ${player.hp}
 | Attack : ${player.attackAmount()}
+| Item   : 공격력 아이템 ${player.inventory['attack']} 개, 체력 아이템 ${player.inventory['hp']} 개, 연막탄 ${player.inventory['smoke']} 개, 회복약 ${player.inventory['heal']} 개 
 \n`
     ));
     console.log(chalk.redBright(`
@@ -136,7 +137,7 @@ const battle = async (player, monster) => {
 
         if (monster.isDead) {
             hasWon = true;
-            await stageClear();
+            await winBattle(player);
             break;
         }
 
@@ -146,7 +147,7 @@ const battle = async (player, monster) => {
         }
         // end 탈출 체크
 
-        let actions = ['1. 공격한다.', '2. 도망간다.'];
+        let actions = ['1. 공격한다.', '2. 회복약 사용', '3. 도망간다.'];
 
         const choice = await selectOption(logs, player, monster, actions);
 
@@ -156,7 +157,6 @@ const battle = async (player, monster) => {
         logs.push(chalk.green(`${actions[choice]} 를 선택하셨습니다.`));
 
         hasRun = await handleUserInput(logs, choice, player, monster);
-
     }
 
     return hasWon;
@@ -171,8 +171,12 @@ const gameOver = async () => {
     await Tools.confirmInput();
 }
 
-const stageClear = async () => {
+const winBattle = async (player) => {
     console.log(chalk.green(`이겼습니다!`));
+
+    const res = Tools.getItem();
+
+    player.inventory[res] += 1;
 
     console.log(`엔터를 눌러주세요.`);
     await Tools.confirmInput();
@@ -190,6 +194,17 @@ const runAway = async () => {
 
 async function handleUserInput(logs, choice, player, monster) {
     let flag = false;
+
+    // 몬스터 공격
+    const monsterAttack = (logs, player, monster) => {
+        //defense
+        let monsterDamage = monster.damage;
+        player.takeDamage(monsterDamage);
+        logs.push(chalk.red(`${monsterDamage}만큼 공격 당했습니다!`));
+
+        logs.push('\n');
+    }
+
     switch (choice) {
         case 0:    // attack
             let playerDamage = player.damage;
@@ -197,24 +212,31 @@ async function handleUserInput(logs, choice, player, monster) {
 
             logs.push(chalk.blue(`${playerDamage}만큼 공격했습니다!`));
 
-            //defense
-            let monsterDamage = monster.damage;
-            player.takeDamage(monsterDamage);
+            monsterAttack(logs, player, monster);
 
-            logs.push(chalk.red(`${monsterDamage}만큼 공격 당했습니다!`));
-
-            logs.push('\n');
             break;
 
-        case 1:   // run away
-            if(Tools.getRandomNum(0,1) === 0){
+        case 1:   // heal
+            if (player.inventory['heal'] === 0) {
+                logs.push(chalk.magentaBright(`회복약이 없습니다!`));
+            } else {
+                logs.push(chalk.blue(`회복약을 사용했습니다.`));
+
+                player.useHealItem();
+
+                player.inventory['heal'] -= 1;
+
+                logs.push(chalk.blue(`체력이 ${player.hp}가 되었습니다!`));
+            }
+            monsterAttack(logs, player, monster);
+            break;
+        case 2:   // run away
+            if (Tools.getRandomNum(0, 1) === 0) {
                 flag = true;
             } else {
                 logs.push(chalk.magentaBright(`히히 못 가!`));
 
-                let monsterDamage = monster.damage;
-                player.takeDamage(monsterDamage);
-                logs.push(chalk.red(`${monsterDamage}만큼 공격 당했습니다!`));
+                monsterAttack(logs, player, monster);
             }
             break;
 
@@ -243,7 +265,7 @@ export async function battleLoop(num, player) {
             return;
         }
 
-        if(!hasWon) break;
+        if (!hasWon) break;
     }
 
     return hasWon;
