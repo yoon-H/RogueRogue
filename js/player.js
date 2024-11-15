@@ -42,14 +42,14 @@ export class Player {
     }
 
     get maxDamage() {
-        return this.maxDamage + 5 * Math.floor(this._inventory['attack'] /3);
+        return this._maxDamage + 5 * Math.floor(this._inventory['attack'] /3);
     }
 
 
     // 데미지
     get damage() {
         //데미지 값 랜덤 계산
-        let amount = Tools.getRandomNum(minDamage, maxDamage);
+        let amount = Tools.getRandomNum(this.minDamage, this.maxDamage);
 
         return amount;
     }
@@ -63,21 +63,21 @@ export class Player {
     }
 
     takeDamage(damage) {
-        this._hp = this._hp - damage;
+        this.hp = this.hp - damage;
 
-        if (this._hp <= 0) {
-            this._hp = 0;
+        if (this.hp <= 0) {
+            this.hp = 0;
 
-            this._isDead = true; //dead
+            this.isDead = true; //dead
         }
     }
 
     reset() {
-        this._hp = this._MaxHP;
+        this._hp = this.MaxHp;
     }
 
     attackAmount() {
-        return Math.floor((this._maxDamage + this._minDamage) / 2);
+        return Math.floor((this.maxDamage + this.minDamage) / 2);
     }
 
 }

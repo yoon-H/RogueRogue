@@ -119,7 +119,7 @@ function userMoveInput(board, arr, player) {
                 case 'stairs':
 
                     //다음 스테이지로 이동
-                    await selectStageClear(arr);
+                    await selectStageClear(arr, player);
 
                     break;
             }
@@ -131,7 +131,7 @@ function userMoveInput(board, arr, player) {
 // #region 분기 처리
 const meetMonster = async (board, map, monsters, player) => {
 
-    printBoard(map);
+    showScreen(map, player)
 
     console.log(chalk.red(`몬스터를 발견했어요!`));
 
@@ -152,13 +152,13 @@ const meetMonster = async (board, map, monsters, player) => {
 
 
 // #region 스테이지 옵션 선택하기
-async function selectStage(arr) {
+async function selectStage(arr, player) {
     let index = 0;
 
     const actions = ['1. 다음 스테이지로!', '2. 싫어요!'];
 
     //기존 로그 출력
-    printBoard(arr);
+    showScreen(arr, player);
 
     //옵션 출력
     renderOptions(actions, index);
@@ -219,9 +219,9 @@ function select(arr, options, selectedIndex) {
 
 }
 
-const selectStageClear = async (map) => {
+const selectStageClear = async (map, player) => {
 
-    const flag = await selectStage(map);
+    const flag = await selectStage(map, player);
 
     if (flag) {
         GameManager.currentStage += 1;

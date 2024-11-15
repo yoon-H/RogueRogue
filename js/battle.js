@@ -97,7 +97,6 @@ function displayStatus(player, monster) {
         `
 | 플레이어 정보
 ----------------
-| LEVEL  : ${player.level} 
 | HP     : ${player.hp}
 | Attack : ${player.attackAmount()}
 \n`
@@ -125,7 +124,6 @@ const battle = async (player, monster) => {
     let hasRun = false;
 
     while (!GameManager.isGameOver) {
-        //console.clear();
 
         displayScreen(logs, player, monster);
 
