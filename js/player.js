@@ -4,21 +4,13 @@ import { Tools } from './tools.js'
 
 export class Player {
     constructor() {
-        this._level = 1;
         this._isDead = false;
-        this._MaxHP = 100;
-        this._hp = 20;
-        this._minDamage = 5;
-        this._maxDamage = 10;
-        this._speed = 5;
-        this._equipment = {};       // 장비 칸
-        this._statusEffect = {};    // 상태 이상 칸
-        this._buffEffect = {};      // 속성 버프 칸
+        this._MaxHP = 50;
+        this._hp = this._MaxHP;
+        this._minDamage = 2;
+        this._maxDamage = 3;
+        this._inventory = {attack : 0, damage : 0, smoke : 0, heal : 0};
         this._loc = new Point(0, 0);
-    }
-
-    get level() {
-        return this._level;
     }
 
     get isDead() {
@@ -29,8 +21,8 @@ export class Player {
         this._isDead = value;
     }
 
-    get speed() {
-        return this._speed;
+    get MaxHp() {
+        return 40;
     }
 
     get hp() {
@@ -57,15 +49,11 @@ export class Player {
         this._loc = value;
     }
 
-
-
     takeDamage(damage) {
         this._hp = this._hp - damage;
 
         if (this._hp <= 0) {
             this._hp = 0;
-
-            //TODO gameover task
 
             this._isDead = true; //dead
         }
@@ -76,7 +64,7 @@ export class Player {
     }
 
     attackAmount() {
-        return (this._maxDamage + this._minDamage) / 2;
+        return Math.floor((this._maxDamage + this._minDamage) / 2);
     }
 
 }

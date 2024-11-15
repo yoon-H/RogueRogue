@@ -68,7 +68,6 @@ function userMoveInput(board, arr, player) {
 
     return new Promise((resolve) => {
         async function handleMoveInput(ch, key) {
-            console.log("move : ", key.name);
             if (key) {
                 if (key.name === "up" || key.name === "w") { //위로 가기
                     //분기 처리
@@ -252,6 +251,23 @@ function newStage(player) {
     }
 }
 
+//Show Screen
+function showScreen(map, player) {
+
+    //맵 그리기
+    printBoard(map);
+
+    //상태 그리기
+    displayStatus(player);
+}
+
+//Show Status
+function displayStatus(player) {
+    console.log(chalk.magentaBright(`\n=== Current Status ===`));
+    console.log(chalk.cyanBright(`| Stage: ${GameManager.currentStage} | 플레이어 정보 | HP : ${player.hp} | `));
+    console.log(chalk.magentaBright(`=====================\n`));
+}
+
 
 
 // gameLoop
@@ -267,10 +283,7 @@ async function game(stage, player) {
 
         while (!GameManager.isGameOver && GameManager.currentStage === stage) {
 
-            //맵 그리기
-            printBoard(map);
-
-            console.log('loop');
+            showScreen(map, player);
 
             //입력 처리
             await userMoveInput(board, map, player);

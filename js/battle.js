@@ -81,8 +81,6 @@ function renderOptions(options, selectedIndex) {
 
 }
 
-
-
 function displayScreen(logs, player, monster) {
     console.clear();
     displayStatus(player, monster);
@@ -92,7 +90,7 @@ function displayScreen(logs, player, monster) {
 
 
 // #region 정보 보여주기
-function displayStatus( player, monster) {
+function displayStatus(player, monster) {
     console.log(chalk.magentaBright(`\n=== Current Status ===`));
     console.log(chalk.cyanBright(`| Stage: ${GameManager.currentStage} |\n`));
     console.log(chalk.blueBright(
@@ -103,17 +101,15 @@ function displayStatus( player, monster) {
 | HP     : ${player.hp}
 | Attack : ${player.attackAmount()}
 \n`
-    ))
-
+    ));
     console.log(chalk.redBright(`
 | 몬스터 정보
 ----------------
-| LEVEL  : ${monster.level} 
 | HP     : ${monster.hp}
 | Attack : ${monster.attackAmount()}
 \n`
 
-    ))
+    ));
 
     console.log(chalk.magentaBright(`=====================\n`));
 }
@@ -224,7 +220,7 @@ async function handleUserInput(logs, choice, player, monster) {
 
 
 // 게임 시작
-export async function battleLoop( num, player) {
+export async function battleLoop(num, player) {
     console.clear();
 
     const stage = GameManager.currentStage;
