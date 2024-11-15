@@ -164,7 +164,7 @@ async function selectStage(arr, player) {
     renderOptions(actions, index);
 
     //선택하기
-    index = await select(arr, actions, index);  // resolve를 파라미터로 전달
+    index = await select(arr, actions, index, player);  // resolve를 파라미터로 전달
 
     return index === 0;
 
@@ -185,17 +185,17 @@ function renderOptions(options, selectedIndex) {
 }
 
 // 선택하기
-function select(arr, options, selectedIndex) {
+function select(arr, options, selectedIndex, player) {
     return new Promise((resolve) => {
         function handleOptionInput(ch, key) {
             if (key) {
                 if (key.name === "up" || key.name === "w") {
                     selectedIndex = (selectedIndex - 1 + options.length) % options.length;
-                    printBoard(arr);
+                    showScreen(arr, player);
                     renderOptions(options, selectedIndex);
                 } else if (key.name === "down" || key.name === "s") {
                     selectedIndex = (selectedIndex + 1) % options.length;
-                    printBoard(arr);
+                    showScreen(arr, player);
                     renderOptions(options, selectedIndex);
                 } else if (key.name === "return") {
 

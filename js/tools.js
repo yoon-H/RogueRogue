@@ -55,6 +55,6 @@ export class Tools {
                 break;
         }
 
-        return 'heal';
+        return item;
     }
 }

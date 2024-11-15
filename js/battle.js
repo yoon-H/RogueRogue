@@ -147,7 +147,7 @@ const battle = async (player, monster) => {
         }
         // end 탈출 체크
 
-        let actions = ['1. 공격한다.', '2. 회복약 사용', '3. 도망간다.'];
+        let actions = ['1. 공격한다.', '2. 회복약 사용', '3. 도망간다.', '4. 연막탄을 사용해서 도망간다!'];
 
         const choice = await selectOption(logs, player, monster, actions);
 
@@ -238,6 +238,21 @@ async function handleUserInput(logs, choice, player, monster) {
 
                 monsterAttack(logs, player, monster);
             }
+            break;
+        case 3:   // smoke
+            if (player.inventory['smoke'] > 0) {
+
+                logs.push(chalk.blue(`연막탄을 사용했습니다!`));
+
+                player.inventory['smoke'] -= 1;
+
+                flag = true;
+            } else {
+                logs.push(chalk.magentaBright(`연막탄이 없습니다!`));
+
+                monsterAttack(logs, player, monster);
+            }
+
             break;
 
     }
