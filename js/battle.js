@@ -174,7 +174,7 @@ const gameOver = async () => {
 const winBattle = async (player) => {
     console.log(chalk.green(`이겼습니다!`));
 
-    const res = Tools.getItem();
+    const res = Tools.getItem(true);
 
     player.inventory[res] += 1;
 
