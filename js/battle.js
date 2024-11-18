@@ -1,9 +1,7 @@
 import chalk from 'chalk';
-//import readlineSync from 'readline-sync';
 import keypress from 'keypress';
 import { Monster } from './monster.js';
 import { GameManager } from './gameManager.js';
-import { start } from "./server.js";
 import { Tools } from './tools.js';
 
 keypress(process.stdin);

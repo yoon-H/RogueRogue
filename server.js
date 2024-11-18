@@ -1,8 +1,8 @@
 import chalk from 'chalk';
 import figlet from 'figlet';
-import { startGame } from "./game.js";
+import { startGame } from "./js/game.js";
 import keypress from 'keypress';
-import { GameManager } from './gameManager.js';
+import { GameManager } from './js/gameManager.js';
 
 keypress(process.stdin);
 
