@@ -6,7 +6,7 @@ import { Tools } from './tools.js';
 import chalk from 'chalk';
 import { battleLoop } from './battle.js';
 import { GameManager } from './gameManager.js';
-import { start } from './server.js';
+import { start } from '../server.js';
 
 keypress(process.stdin);
 

@@ -32,8 +32,11 @@ export class Tools {
         })
     }
 
-    static getItem() {
-        const rand = this.getRandomNum(0, 3);
+    static getItem(status = false) {
+
+        let rand;
+        if(status) rand = this.getRandomNum(0, 1);
+        else rand = this.getRandomNum(0, 3);
 
         let item = '';
         switch (rand) {
