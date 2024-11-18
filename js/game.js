@@ -1,166 +1,334 @@
-import chalk from 'chalk';
-import readlineSync from 'readline-sync';
+import keypress from 'keypress';
 import { Player } from './player.js';
-import { Monster } from './monster.js';
+import { generateMap, printBoard } from './map.js';
+import { Point } from './map.js';
+import { Tools } from './tools.js';
+import chalk from 'chalk';
+import { battleLoop } from './battle.js';
 import { GameManager } from './gameManager.js';
-import { start } from "./server.js";
+import { start } from '../server.js';
 
-function displayStatus(stage, player, monster) {
+keypress(process.stdin);
+
+// 이동하기
+function move(board, arr, dx, dy, player) {
+    arr[player.x][player.y] = '·';
+
+    player.x += dx;
+    player.y += dy;
+
+    arr[player.x][player.y] = '●';
+
+    const res = drawMap(board, arr, player.x, player.y);
+
+    return res;
+}
+
+// 타일 탐색
+function checkTile(arr, x, y) { // 'wall', 'space' , 'stairs' ,  'none'
+
+    if (arr[x][y] === '%') {
+        return 'wall';
+    }
+    else if (arr[x][y] === '·') {
+        return 'space';
+    }
+    else if (arr[x][y] === '■') {
+        return 'stairs';
+    }
+    else if (arr[x][y] === '♥') {
+        return 'item'
+    }
+    else {
+        return 'none';
+    }
+}
+
+//맵 그리기
+function drawMap(board, arr, x, y) {
+
+    //주변에 몬스터 있는지 체크
+    let isMonster = [];
+
+    for (let i = x - 1; i <= x + 1; i++) {
+        for (let j = y - 1; j <= y + 1; j++) {
+            if (arr[i][j] === ' ') {
+                arr[i][j] = board[i][j];
+
+                if (board[i][j] === '▲')
+                    isMonster.push(new Point(i, j));
+            }
+        }
+    }
+
+    return isMonster;
+}
+
+// 이동 입력하기
+function userMoveInput(board, arr, player) {
+
+    let loc = player.loc;
+
+    return new Promise((resolve) => {
+        async function handleMoveInput(ch, key) {
+            if (key) {
+                if (key.name === "up" || key.name === "w") { //위로 가기
+                    //분기 처리
+                    await inputHandler(board, arr, player, -1, 0);
+                    resolve(true);
+                } else if (key.name === "down" || key.name === "s") { //아래로 가기
+                    //분기 처리
+                    await inputHandler(board, arr, player, 1, 0);
+                    resolve(true);
+                } else if (key.name === "left" || key.name === "a") { //왼쪽으로 가기
+                    //분기 처리
+                    await inputHandler(board, arr, player, 0, -1);
+                    resolve(true);
+                } else if (key.name === "right" || key.name === "d") { //오른쪽으로 가기
+                    //분기 처리
+                    await inputHandler(board, arr, player, 0, 1);
+                    resolve(true);
+                } else if (key.ctrl && key.name === "c") {
+                    process.exit();
+                }
+            }
+        }
+
+        // 입력 설정
+        process.stdin.on("keypress", handleMoveInput);
+        process.stdin.setRawMode(true);
+        process.stdin.resume();
+
+        //입력 설정(입력 이벤트 제거)
+        const deleteInput = () => {
+            process.stdin.setRawMode(false);
+            process.stdin.pause();
+            process.stdin.removeListener("keypress", handleMoveInput); // 이벤트 리스너 제거
+        }
+
+        const inputHandler = async (board, arr, player, dx, dy) => {
+            // 이벤트 삭제
+            deleteInput();
+            switch (checkTile(board, loc.x + dx, loc.y + dy)) {
+                case 'space':
+                    const res = move(board, arr, dx, dy, loc);
+                    if (res.length > 0) {
+
+                        //battle 로그
+                        await meetMonster(board, arr, res, player);
+                    }
+                    break;
+                case 'item':
+                    const item = Tools.getItem();
+
+                    player.inventory[item] += 1;
+
+                    console.log(`엔터를 눌러주세요.`);
+                    await Tools.confirmInput();
+
+                    board[loc.x + dx][loc.y + dy] = '·';
+
+                    const result = move(board, arr, dx, dy, loc);
+                    if (result.length > 0) {
+
+                        //battle 로그
+                        await meetMonster(board, arr, result, player);
+                    }
+
+                    break;
+
+                case 'stairs':
+
+                    //다음 스테이지로 이동
+                    await selectStageClear(arr, player);
+
+                    break;
+            }
+        }
+    })
+
+}
+
+// #region 분기 처리
+const meetMonster = async (board, map, monsters, player) => {
+
+    showScreen(map, player)
+
+    console.log(chalk.red(`몬스터를 발견했어요!`));
+
+    console.log(chalk.gray(`엔터를 눌러주세요.`));
+    const confirm = await Tools.confirmInput();
+
+    console.log(confirm);
+
+    const res = await battleLoop(monsters.length, player);
+
+    if (res) {
+        for (const item of monsters) {
+            map[item.x][item.y] = '·';
+            board[item.x][item.y] = '·';
+        }
+    }
+}
+
+
+// #region 스테이지 옵션 선택하기
+async function selectStage(arr, player) {
+    let index = 0;
+
+    const actions = ['1. 다음 스테이지로!', '2. 싫어요!'];
+
+    //기존 로그 출력
+    showScreen(arr, player);
+
+    //옵션 출력
+    renderOptions(actions, index);
+
+    //선택하기
+    index = await select(arr, actions, index, player);  // resolve를 파라미터로 전달
+
+    return index === 0;
+
+}
+
+//옵션 보여주기
+function renderOptions(options, selectedIndex) {
+    console.log(chalk.red(`다음 스테이지로 넘어갈까요?`));
+
+    options.forEach((option, index) => {
+        if (index === selectedIndex) {
+            console.log(`> ${option}`); // 현재 선택된 항목에 화살표 표시
+        } else {
+            console.log(`  ${option}`);
+        }
+    });
+
+}
+
+// 선택하기
+function select(arr, options, selectedIndex, player) {
+    return new Promise((resolve) => {
+        function handleOptionInput(ch, key) {
+            if (key) {
+                if (key.name === "up" || key.name === "w") {
+                    selectedIndex = (selectedIndex - 1 + options.length) % options.length;
+                    showScreen(arr, player);
+                    renderOptions(options, selectedIndex);
+                } else if (key.name === "down" || key.name === "s") {
+                    selectedIndex = (selectedIndex + 1) % options.length;
+                    showScreen(arr, player);
+                    renderOptions(options, selectedIndex);
+                } else if (key.name === "return") {
+
+                    //입력 설정(입력 이벤트 제거)
+                    process.stdin.setRawMode(false);
+                    process.stdin.pause();
+                    process.stdin.removeListener("keypress", handleOptionInput); // 이벤트 리스너 제거
+                    resolve(selectedIndex); // 선택 완료 후 resolve 호출
+                } else if (key.ctrl && key.name === "c") {
+                    process.exit();
+                }
+            }
+        }
+
+        // 입력 설정
+        process.stdin.on("keypress", handleOptionInput);
+        process.stdin.setRawMode(true);
+        process.stdin.resume();
+
+    })
+
+}
+
+const selectStageClear = async (map, player) => {
+
+    const flag = await selectStage(map, player);
+
+    if (flag) {
+        GameManager.currentStage += 1;
+    }
+
+}
+
+// #endregion
+
+// #endregion 
+
+// 스테이지 시작 
+function newStage(player) {
+    // 맵 생성
+    const _board = generateMap(player.loc);
+
+    // 시야 맵
+    let _map = Array.from(new Array(_board.length), () => new Array(_board[0].length).fill(' '));
+
+    //처음 맵 그리기
+    drawMap(_board, _map, player.loc.x, player.loc.y);
+    _map[player.loc.x][player.loc.y] = '●';
+
+    return {
+        board: _board,
+        map: _map
+    }
+}
+
+//Show Screen
+function showScreen(map, player) {
+
+    //맵 그리기
+    printBoard(map);
+
+    //상태 그리기
+    displayStatus(player);
+}
+
+//Show Status
+function displayStatus(player) {
     console.log(chalk.magentaBright(`\n=== Current Status ===`));
-    console.log(chalk.cyanBright(`| Stage: ${stage} |\n`));
-    console.log(chalk.blueBright(
-        `
-| 플레이어 정보
-----------------
-| LEVEL  : ${player.level} 
-| HP     : ${player.hp}
-| Attack : ${player.attackAmount()}
-\n`
-    ))
-
-    console.log(chalk.redBright(`
-| 몬스터 정보
-----------------
-| LEVEL  : ${monster.level} 
-| HP     : ${monster.hp}
-| Attack : ${monster.attackAmount()}
-\n`
-
-    ))
-
+    console.log(chalk.cyanBright(`| Stage: ${GameManager.currentStage} | 플레이어 정보 | HP : ${player.hp} | `));
+    console.log(chalk.cyanBright(
+        `| Item   : 공격력 아이템 ${player.inventory['attack']} 개, 체력 아이템 ${player.inventory['hp']} 개, 연막탄 ${player.inventory['smoke']} 개, 회복약 ${player.inventory['heal']} 개`
+    ));
     console.log(chalk.magentaBright(`=====================\n`));
 }
 
-const battle = async (stage, player, monster) => {
 
-    let logs = [];
 
-    // 이겼나
-    let hasWon = false;
-    let hasRun = false;
+// gameLoop
+async function game(stage, player) {
 
     while (!GameManager.isGameOver) {
-        console.clear();
 
-        displayStatus(stage, player, monster);
+        //스테이지 초기화
+        stage = GameManager.currentStage;
 
-        logs.forEach((log) => console.log(log));
+        //새로운 스테이지 생성
+        let { board, map } = newStage(player);
 
-        // 탈출 체크
-        if (player.isDead) {
-            GameManager.isGameOver = true;
-            gameOver();
-            break;
+        // 플레이어 체력 회복
+        player.reset();
+
+        while (!GameManager.isGameOver && GameManager.currentStage === stage) {
+
+            showScreen(map, player);
+
+            //입력 처리
+            await userMoveInput(board, map, player);
         }
-
-        if (monster.isDead) {
-            hasWon = true;
-            stageClear();
-            break;
-        }
-
-        if(hasRun)
-        {
-            runAway();
-            break;
-        }
-        // end 탈출 체크
-
-        console.log(
-            chalk.green(
-                `\n1. 공격한다 2. 도망간다.`,
-            ),
-        );
-        const choice = readlineSync.question('당신의 선택은? ');
-
-        logs = [];
-
-        // 플레이어의 선택에 따라 다음 행동 처리
-        logs.push(chalk.green(`${choice}를 선택하셨습니다.`));
-
-        hasRun = await handleUserInput(logs, choice, player, monster)
-
     }
 
-    return hasWon;
-
-};
-
-//분기 처리
-const gameOver = async() => {
-    console.log(chalk.red(`GAME OVER!`));
-
-    readlineSync.question('엔터를 눌러주세요.');
-}
-
-const stageClear = async() => {
-    console.log(chalk.green(`이겼습니다!`));
-
-    readlineSync.question('엔터를 눌러주세요.');
-}
-
-const runAway = async() => {
-    console.log(chalk.blue(`도망쳤습니다!`));
-
-    readlineSync.question('엔터를 눌러주세요.');
-}
-// end 분기 처리
-
-async function handleUserInput(logs, choice, player, monster) {
-
-    let flag = false;
-    switch (choice) {
-        case '1':    // attack
-            let playerDamage = player.damage;
-            monster.takeDamage(playerDamage);
-
-            logs.push(chalk.blue(`${playerDamage}만큼 공격했습니다!`));
-
-            //defense
-            let monsterDamage = monster.damage;
-            player.takeDamage(monsterDamage);
-
-            logs.push(chalk.red(`${monster.damage}만큼 공격 당했습니다!`));
-
-            logs.push('\n');
-            break;
-
-        case '2':   // run away
-            flag = true;
-            break;
-
-    }
-
-    return flag;
+    //게임 오버 하면
+    start();
 }
 
 
 
 // 게임 시작
 export async function startGame() {
-    console.clear();
     const player = new Player();
+
+    //현재 스테이지
     let stage = 1;
 
-    while (stage <= 10) {
-        const monster = new Monster(stage);
-        let hasWon = await battle(stage, player, monster);
-
-        //GameOver
-        if (GameManager.isGameOver) {
-            GameManager.isGameOver = false;
-            player.isDead = false;
-            start();
-            break;
-        }
-
-        // 플레이어 체력 회복
-        player.reset();
-
-        // 스테이지 클리어 및 게임 종료 조건
-
-        if (hasWon) {
-            stage++;
-        }
-    }
+    game(stage, player);
 }
